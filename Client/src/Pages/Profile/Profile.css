@@ -1,0 +1,66 @@
+.profile-container {
+  padding: 25px;
+  background: #f8fafc;
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.page-subtext {
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.profile-card {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  max-width: 500px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.profile-form label {
+  font-weight: 600;
+  color: #334155;
+  font-size: 14px;
+}
+
+.profile-form input {
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.profile-form input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 5px rgba(124, 58, 237, 0.4);
+}
+
+.save-button {
+  padding: 12px;
+  border-radius: 12px;
+  background: #7c3aed;
+  color: white;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.save-button:hover {
+  background: #5a1fd4;
+}

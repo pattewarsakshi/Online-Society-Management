@@ -15,7 +15,7 @@ export default function Navbar() {
     <div className="navbar">
       <div className="navbar-left">
         <h2 className="navbar-title">
-          {role === "admin" ? "Admin Panel" : "Member Panel"}
+          {role === "admin" ? "UrbanNest Admininster Panel" : "Member Panel"}
         </h2>
       </div>
 

@@ -1,0 +1,174 @@
+.complaints-container {
+  padding: 25px;
+  background: #f8fafc;
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.page-subtext {
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.table-card {
+  background: white;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.complaints-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.complaints-table thead {
+  background: #f1f5f9;
+}
+
+.complaints-table th,
+.complaints-table td {
+  padding: 12px;
+  font-size: 14px;
+  color: #334155;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.complaints-table tr:hover {
+  background: #f7f9fb;
+}
+
+/* Status Tag */
+.status-tag {
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-tag.pending {
+  background: rgba(255, 188, 0, 0.2);
+  color: #b18100;
+}
+
+.status-tag.inprogress {
+  background: rgba(52, 152, 219, 0.2);
+  color: #217dbb;
+}
+
+.status-tag.resolved {
+  background: rgba(0, 168, 50, 0.2);
+  color: #008631;
+}
+
+select {
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 13px;
+  outline: none;
+  transition: 0.2s;
+}
+
+select:hover,
+select:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 4px rgba(124, 58, 237, 0.4);
+}
+.filter-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  transition: 0.2s;
+}
+
+.search-input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 5px rgba(124, 58, 237, 0.4);
+}
+
+.filter-select {
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: white;
+  font-size: 14px;
+}
+.complaints-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* makes column widths consistent */
+}
+
+.complaints-table thead {
+  background: #f1f5f9;
+}
+
+.complaints-table th,
+.complaints-table td {
+  padding: 10px 12px;       /* slightly smaller padding for better alignment */
+  font-size: 14px;
+  color: #334155;
+  border-bottom: 1px solid #eef2f7;
+  text-align: left;          /* default left alignment */
+  word-wrap: break-word;     /* wrap long text in description */
+}
+
+/* Align specific columns */
+.complaints-table th:nth-child(4),
+.complaints-table td:nth-child(4) {
+  text-align: center; /* Date column center */
+}
+
+.complaints-table th:nth-child(5),
+.complaints-table td:nth-child(5),
+.complaints-table th:nth-child(6),
+.complaints-table td:nth-child(6) {
+  text-align: center; /* Status and Change Status center */
+}
+
+/* Adjust column widths */
+.complaints-table th:nth-child(1),
+.complaints-table td:nth-child(1) {
+  width: 15%; /* Name */
+}
+
+.complaints-table th:nth-child(2),
+.complaints-table td:nth-child(2) {
+  width: 15%; /* Type */
+}
+
+.complaints-table th:nth-child(3),
+.complaints-table td:nth-child(3) {
+  width: 35%; /* Description (longest) */
+}
+
+.complaints-table th:nth-child(4),
+.complaints-table td:nth-child(4) {
+  width: 15%; /* Date */
+}
+
+.complaints-table th:nth-child(5),
+.complaints-table td:nth-child(5),
+.complaints-table th:nth-child(6),
+.complaints-table td:nth-child(6) {
+  width: 10%; /* Status & Change Status */
+}
+
+.complaints-table tr:hover {
+  background: #f7f9fb;
+}
