@@ -38,6 +38,17 @@ import ErrorPage from "./Pages/ErrorPage/ErrorPage";
 
 import ProtectedRoute from "./Components/ProtectedRoute";
 
+
+import VisitorsList from "./Pages/Visitors/VisitorsList";
+import AddVisitor from "./Pages/Visitors/AddVisitor";
+
+import ParkingList from "./Pages/parking/ParkingList";
+
+import DocumentsList from "./Pages/documents/DocumentsList";
+import UploadDocument from "./Pages/documents/DocumentsList";
+
+import Notifications from "./Pages/notifications/Notifications";
+
 function App() {
   return (
     <BrowserRouter>
@@ -93,8 +104,28 @@ function App() {
         {/* PROFILE */}
         <Route path="/profile" element={<Profile />} />
 
+ {/* VISITORS */}
+  <Route path="/visitors" element={<VisitorsList />} />
+        <Route path="/visitors/add" element={<AddVisitor />} />
+
+
+{/* PARKING */}
+        <Route path="/parking" element={<ParkingList />} />
+
+{/* DOCUMENTS */}
+        <Route path="/documents" element={<DocumentsList />} />
+        <Route path="/documents/upload" element={<UploadDocument />} />
+
+
+         {/* NOTIFICATIONS */}
+        <Route path="/notifications" element={<Notifications />} />git branch
+
+
+
         {/* ERROR PAGE */}
         <Route path="*" element={<ErrorPage />} />
+
+         
 
       </Routes>
     </BrowserRouter>
