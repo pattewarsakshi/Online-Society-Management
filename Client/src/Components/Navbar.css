@@ -1,0 +1,56 @@
+/* MAIN NAVBAR WRAPPER */
+.navbar {
+  height: 60px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* RIGHT SIDE (Notifications + Profile) */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+/* NOTIFICATION BELL */
+.notif-bell {
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.notif-container {
+  position: relative;
+}
+
+.notif-dropdown {
+  position: absolute;
+  top: 36px;
+  right: -40px;
+  background: white;
+  width: 230px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.notif-dropdown p {
+  margin: 6px 0;
+}
+
+/* PROFILE MENU */
+.profile-container {
+  position: relative;
+}
+
+.profile-icon {
+  font-size: 
