@@ -3,13 +3,13 @@ import "./Sidebar.css";
 
 export default function Sidebar() {
   const role = localStorage.getItem("role"); // admin or member
-  const location = useLocation();
-  const navigate = useNavigate();
+  const location = useLocation();//location.pathname tells current URL
+  const navigate = useNavigate();//navigate("/") redirects to homepage
 
   // Logout function
   const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
+    localStorage.clear();//Clears stored user data
+    navigate("/");//Redirects user to /
   };
 
   // Menu items for ADMIN
