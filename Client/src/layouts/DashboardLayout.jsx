@@ -1,19 +1,26 @@
-import Sidebar from "../components/Sidebar";
+import { useState } from "react";
 import Navbar from "../Components/Navbar";
+import Sidebar from "../Components/Sidebar";
 import "./DashboardLayout.css";
 
 export default function DashboardLayout({ children }) {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
-    <div className="layout-container">
+    <div className="dashboard-layout">
+      {/* Fixed Top Navbar */}
+      <Navbar onToggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
 
-      {/* LEFT SIDE — SIDEBAR */}
-      <Sidebar />
+      <div className="dashboard-content-wrapper">
+        {/* Optional Collapsible Sidebar */}
+        <Sidebar isOpen={sidebarOpen} />
 
-      {/* RIGHT SIDE — NAVBAR + PAGE CONTENT */}
-      <div className="main-area">
-        <Navbar />
-
-        <div className="page-content">
+        {/* Main Content Area */}
+        <div className={`main-content ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}>
           {children}
         </div>
       </div>

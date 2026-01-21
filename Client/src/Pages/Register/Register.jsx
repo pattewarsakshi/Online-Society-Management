@@ -43,7 +43,7 @@ export default function Register() {
     if (email && !emailRegex.test(email)) newErrors.email = "Invalid email format";
 
     // BLOCK ADMIN EMAIL
-    if (email === "admin@society.com")
+    if (email === "admin@urbannest.com")
       newErrors.email = "This email is reserved for admin.";
 
     // PHONE VALIDATION → ONLY DIGITS
@@ -83,23 +83,25 @@ export default function Register() {
       return;
     }
 
-    // SAVE MEMBER
+    // SAVE MEMBER with default role="member" and status="pending"
     const newMember = {
       id: `member-${Date.now()}`,
       name,
       email,
       phone,
       apartment,
-      password, 
+      password,
+      role: "member", // Default role for all registrations
+      status: "approved", // Default status - requires admin approval
       createdAt: new Date().toISOString(),
     };
 
     members.push(newMember);
     localStorage.setItem("members", JSON.stringify(members));
 
-    toast.success("Registration successful! Redirecting to login...");
+    toast.success("Registration successful! Your account is pending admin approval. Redirecting to login...");
 
-    setTimeout(() => navigate("/"), 1800);
+    setTimeout(() => navigate("/"), 2000);
   };
 
   return (

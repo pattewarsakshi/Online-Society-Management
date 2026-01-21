@@ -1,63 +1,92 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { 
+  FaThLarge, 
+  FaBell, 
+  FaExclamationCircle, 
+  FaCreditCard, 
+  FaUsers, 
+  FaUser, 
+  FaSignOutAlt,
+  FaFileAlt,
+  FaCar,
+  FaSwimmingPool,
+  FaCalendarAlt
+} from "react-icons/fa";
 import "./Sidebar.css";
 
-export default function Sidebar() {
-  const role = localStorage.getItem("role"); // admin or member
+export default function Sidebar({ isOpen = true }) {
+  const { user } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
 
-  // Logout function
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
+  if (!user) return null;
+
+  // Icon mapping function
+  const getIcon = (iconName) => {
+    const iconMap = {
+      dashboard: <FaThLarge />,
+      notices: <FaBell />,
+      complaints: <FaExclamationCircle />,
+      maintenance: <FaCreditCard />,
+      directory: <FaUsers />,
+      profile: <FaUser />,
+      logout: <FaSignOutAlt />,
+      visitors: <FaUsers />,
+      parking: <FaCar />,
+      documents: <FaFileAlt />,
+      notifications: <FaBell />,
+      amenities: <FaSwimmingPool />,
+      events: <FaCalendarAlt />
+    };
+    return iconMap[iconName] || null;
   };
 
   // Menu items for ADMIN
   const adminMenu = [
-    { path: "/admin/dashboard", label: "Dashboard" },
-    { path: "/notices", label: "Notices" },
-    { path: "/complaints", label: "Complaints" },
-    { path: "/maintenance", label: "Maintenance" },
-    { path: "/visitors", label: "Visitors" },
-    { path: "/parking", label: "Parking" },
-    { path: "/documents", label: "Documents" },
-    { path: "/notifications", label: "Notifications" },
-    { path: "/profile", label: "Profile" },
+    { path: "/admin/dashboard", label: "Dashboard", iconName: "dashboard" },
+    { path: "/notices", label: "Notices", iconName: "notices" },
+    { path: "/complaints", label: "Complaints", iconName: "complaints" },
+    { path: "/maintenance", label: "Maintenance", iconName: "maintenance" },
+    { path: "/visitors", label: "Visitors", iconName: "visitors" },
+    { path: "/parking", label: "Parking", iconName: "parking" },
+    { path: "/documents", label: "Documents", iconName: "documents" },
+    { path: "/notifications", label: "Notifications", iconName: "notifications" },
+    { path: "/profile", label: "Profile", iconName: "profile" },
   ];
 
   // Menu items for MEMBER
   const memberMenu = [
-    { path: "/member/dashboard", label: "Dashboard" },
-    { path: "/notices", label: "Notices" },
-    { path: "/complaints", label: "Complaints" },
-    { path: "/maintenance", label: "Maintenance" },
-    { path: "/amenities", label: "Amenities" },
-    { path: "/events", label: "Events" },
-    { path: "/profile", label: "Profile" },
+    { path: "/member/dashboard", label: "Dashboard", iconName: "dashboard" },
+    { path: "/directory", label: "Member Directory", iconName: "directory" },
+    { path: "/notices", label: "Notices", iconName: "notices" },
+    { path: "/complaints", label: "Complaints", iconName: "complaints" },
+    { path: "/maintenance", label: "Maintenance", iconName: "maintenance" },
+    { path: "/amenities", label: "Amenities", iconName: "amenities" },
+    { path: "/events", label: "Events", iconName: "events" },
+    { path: "/profile", label: "Profile", iconName: "profile" },
   ];
 
-  // Select which menu to use
-  const menuItems = role === "admin" ? adminMenu : memberMenu;
+  const menuItems = user?.role === "admin" ? adminMenu : memberMenu;
 
   return (
-    <div className="sidebar">
-      <h2 className="sidebar-title">Society</h2>
+    <aside className={`sidebar ${isOpen ? "open" : "closed"}`}>
+      <div className="sidebar-content">
+        <h2 className="sidebar-title">UrbanNest</h2>
 
-      <ul className="sidebar-menu">
-        {menuItems.map((item) => (
-          <li
-            key={item.path}
-            className={location.pathname === item.path ? "active" : ""}
-          >
-            <Link to={item.path}>{item.label}</Link>
-          </li>
-        ))}
-      </ul>
-
-      {/* LOGOUT BUTTON */}
-      <div className="sidebar-logout" onClick={handleLogout}>
-        Logout
+        <ul className="sidebar-menu">
+          {menuItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <li key={item.path} className={isActive ? "active" : ""}>
+                <Link to={item.path} className="sidebar-link">
+                  {item.iconName && <span className="sidebar-icon">{getIcon(item.iconName)}</span>}
+                  {isOpen && <span className="sidebar-label">{item.label}</span>}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       </div>
-    </div>
+    </aside>
   );
 }

@@ -32,7 +32,7 @@ export default function ForgotPassword() {
     const members = JSON.parse(localStorage.getItem("members") || "[]");
     const memberExists = members.find((u) => u.email === email);
 
-    const isAdmin = email === "admin@society.com";
+    const isAdmin = email === "admin@urbannest.com";
 
     if (!memberExists && !isAdmin) {
       toast.error("Email not found. Please register.");

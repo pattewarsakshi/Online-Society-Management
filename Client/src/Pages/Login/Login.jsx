@@ -1,14 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useAuth } from "../../contexts/AuthContext";
 import "./Login.css";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login, user } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      if (user.role === "admin") {
+        navigate("/admin/dashboard", { replace: true });
+      } else if (user.role === "member" && user.status === "approved") {
+        navigate("/member/dashboard", { replace: true });
+      }
+    }
+  }, [user, navigate]);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -36,11 +49,22 @@ export default function Login() {
     }
 
     // ADMIN LOGIN CHECK
-    if (email === "admin@society.com") {
-      localStorage.setItem("token", `admin-${Date.now()}`);
-      localStorage.setItem("role", "admin");
-      localStorage.setItem("userEmail", email);
+    if (email === "admin@urbannest.com") {
+      // Default admin password is "admin123" (can be changed)
+      if (password !== "admin123") {
+        toast.error("Incorrect password");
+        return;
+      }
 
+      const adminUser = {
+        id: "admin-1",
+        name: "Admin",
+        email: "admin@urbannest.com",
+        role: "admin",
+        status: "approved",
+      };
+
+      login(adminUser);
       toast.success("Admin login successful!");
       setTimeout(() => navigate("/admin/dashboard"), 1500);
       return;
@@ -55,19 +79,34 @@ export default function Login() {
       return;
     }
 
-    // Password check (simple for demo)
+    // Password check
     if (exists.password !== password) {
       toast.error("Incorrect password");
       return;
     }
 
-    // MEMBER LOGIN SUCCESS
-    localStorage.setItem("token", `member-${Date.now()}`);
-    localStorage.setItem("role", "member");
-    localStorage.setItem("userEmail", email);
+    // Check if member status is pending
+    if (exists.status === "pending") {
+      toast.error("Your account is pending approval. Please wait for admin approval.");
+      return;
+    }
 
-    toast.success("Login successful!");
-    setTimeout(() => navigate("/member/dashboard"), 1500);
+    // MEMBER LOGIN SUCCESS - only if status is approved
+    if (exists.status === "approved") {
+      const memberUser = {
+        id: exists.id,
+        name: exists.name,
+        email: exists.email,
+        role: "member",
+        status: "approved",
+      };
+
+      login(memberUser);
+      toast.success("Login successful!");
+      setTimeout(() => navigate("/member/dashboard"), 1500);
+    } else {
+      toast.error("Your account is not approved. Please contact admin.");
+    }
   };
 
   return (
@@ -127,8 +166,8 @@ export default function Login() {
         </form>
 
         <div className="auth-demo-info">
-          <p><strong>Admin Login:</strong> admin@society.com</p>
-          <p><strong>Member Login:</strong> Use any registered email</p>
+          <p><strong>Admin Login:</strong> admin@urbannest.com / admin123</p>
+          <p><strong>Member Login:</strong> Use any registered email (must be approved)</p>
         </div>
 
       </div>

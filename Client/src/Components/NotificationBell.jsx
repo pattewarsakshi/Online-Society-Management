@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaBell } from "react-icons/fa";
 import "./Navbar.css";
 
 export default function NotificationBell({ role }) {
@@ -24,7 +25,7 @@ export default function NotificationBell({ role }) {
         className="notif-bell"
         onClick={() => setOpen(!open)}
       >
-        🔔
+        <FaBell />
       </span>
 
       {open && (

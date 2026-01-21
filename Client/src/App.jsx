@@ -39,7 +39,7 @@ import UploadDocument from "./Pages/documents/UploadDocument";
 import Notifications from "./Pages/notifications/Notifications";
 
 import ErrorPage from "./Pages/ErrorPage/ErrorPage";
-import ProtectedRoute from "./Components/ProtectedRoute";
+import PrivateRoute from "./Components/PrivateRoute";
 
 // ⭐ React Toastify
 import { ToastContainer } from "react-toastify";
@@ -59,9 +59,9 @@ function App() {
         <Route
           path="/admin/dashboard"
           element={
-            <ProtectedRoute role="admin">
+            <PrivateRoute role="admin">
               <AdminDashboard />
-            </ProtectedRoute>
+            </PrivateRoute>
           }
         />
 
@@ -69,9 +69,9 @@ function App() {
         <Route
           path="/member/dashboard"
           element={
-            <ProtectedRoute role="member">
+            <PrivateRoute role="member">
               <MemberDashboard />
-            </ProtectedRoute>
+            </PrivateRoute>
           }
         />
 
