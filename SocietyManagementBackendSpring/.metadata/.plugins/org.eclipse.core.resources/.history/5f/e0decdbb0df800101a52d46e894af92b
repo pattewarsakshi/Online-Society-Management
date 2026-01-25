@@ -1,0 +1,5 @@
+package com.society.repository;
+
+public class ComplaintRepository {
+
+}

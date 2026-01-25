@@ -1,0 +1,43 @@
+package com.society.controller;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.*;
+
+import lombok.RequiredArgsConstructor;
+
+import com.society.dto.*;
+import com.society.entity.Complaint;
+import com.society.service.ComplaintService;
+
+@RestController
+@RequestMapping("/complaints")
+@RequiredArgsConstructor
+public class ComplaintController {
+
+    private final ComplaintService complaintService;
+
+    // Resident
+    @PostMapping
+    public Complaint raiseComplaint(@RequestBody ComplaintRequestDTO dto) {
+        return complaintService.raiseComplaint(dto);
+    }
+
+    @GetMapping("/my")
+    public List<Complaint> myComplaints() {
+        return complaintService.getMyComplaints();
+    }
+
+    // Admin
+    @PostMapping("/admin/search")
+    public List<Complaint> search(@RequestBody AdminComplaintSearchDTO dto) {
+        return complaintService.getComplaintsByFlat(dto);
+    }
+
+    @PutMapping("/{id}/status")
+    public Complaint updateStatus(@PathVariable Integer id,
+                                  @RequestBody ComplaintStatusUpdateDTO dto) {
+        return complaintService.updateStatus(id, dto);
+    }
+}
+
