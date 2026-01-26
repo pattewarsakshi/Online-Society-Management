@@ -1,0 +1,91 @@
+package com.society.service;
+
+import com.society.dto.RegisterRequestDTO;
+import com.society.dto.LoginRequestDTO;
+import com.society.dto.LoginResponseDTO;
+import com.society.entity.Flat;
+import com.society.entity.Society;
+import com.society.entity.User;
+import com.society.entityenum.Role;
+import com.society.repository.FlatRepository;
+import com.society.repository.SocietyRepository;
+import com.society.repository.UserRepository;
+
+import jakarta.servlet.http.HttpSession;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
+    private final SocietyRepository societyRepository;
+    private final FlatRepository flatRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    // ================= REGISTER =================
+    @Override
+    public User registerUser(RegisterRequestDTO dto, boolean isAdminCreation) {
+
+        // 🔒 Block ADMIN & GUARD only for SELF register
+        if (!isAdminCreation &&
+            (dto.getRole() == Role.ADMIN || dto.getRole() == Role.GUARD)) {
+            throw new RuntimeException("This role cannot self-register");
+        }
+
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new RuntimeException("Email already registered");
+        }
+
+        Society society = societyRepository.findById(dto.getSocietyId())
+                .orElseThrow(() -> new RuntimeException("Society not found"));
+
+        User user = new User();
+        user.setFirstName(dto.getFirstName());
+        user.setMiddleName(dto.getMiddleName());
+        user.setLastName(dto.getLastName());
+        user.setEmail(dto.getEmail());
+        user.setPhone(dto.getPhone());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setRole(dto.getRole());
+        user.setSociety(society);
+
+        // Flat optional
+        if (dto.getFlatId() != null) {
+            Flat flat = flatRepository.findById(dto.getFlatId())
+                    .orElseThrow(() -> new RuntimeException("Flat not found"));
+            user.setFlat(flat);
+        }
+
+        return userRepository.save(user);
+    }
+
+    // ================= LOGIN =================
+    @Override
+    public LoginResponseDTO loginUser(
+            LoginRequestDTO request,
+            HttpSession session) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Invalid email"));
+
+        if (!passwordEncoder.matches(
+                request.getPassword(),
+                user.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
+
+        session.setAttribute("LOGGED_IN_USER", user);
+
+        return new LoginResponseDTO(
+                user.getUserId(),
+                user.getFirstName() + " " + user.getLastName(),
+                user.getRole().name(),
+                user.getSociety().getSocietyId()
+        );
+    }
+}

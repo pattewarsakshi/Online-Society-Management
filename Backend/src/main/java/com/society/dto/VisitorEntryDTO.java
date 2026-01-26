@@ -1,22 +1,14 @@
 package com.society.dto;
 
+import lombok.Getter;
+import lombok.Setter;
 
-
-/* ========= ENUM ========= */
-import com.society.entityenum.VisitPurpose;
-
-/* ========= LOMBOK ========= */
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class VisitorEntryDTO {
 
     private String visitorName;
     private String phone;
-    private VisitPurpose purpose;
+    private String purpose;
+    private Integer flatId;
 }
-

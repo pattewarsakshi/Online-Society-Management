@@ -1,54 +1,36 @@
 package com.society.entity;
 
-
-
-/* ========= JPA ========= */
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-
-/* ========= JAVA ========= */
 import java.time.LocalDateTime;
-
-import com.society.entityenum.VisitPurpose;
-
-/* ========= LOMBOK ========= */
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
-@Table(name = "visitor")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Visitor {
+public class Visitor extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer visitorId;
 
-    @Column(nullable = false)
     private String visitorName;
-
     private String phone;
+    private String purpose;
 
     private LocalDateTime entryTime;
-
     private LocalDateTime exitTime;
 
-    @Enumerated(EnumType.STRING)
-    private VisitPurpose purpose;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "flat_id")
     private Flat flat;
-}
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "society_id")
+    private Society society;
+}

@@ -2,10 +2,7 @@ package com.society.entityenum;
 
 public enum PaymentStatus {
     PENDING,
+    APPROVAL_PENDING,
     PAID,
-    OVERDUE,
-    PARTIALLY_PAID,
-    FAILED,
-    WAIVED
-
+    REJECTED
 }

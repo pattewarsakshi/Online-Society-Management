@@ -1,7 +1,5 @@
 package com.society.entity;
 
-
-
 /* ========= JPA / HIBERNATE ========= */
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -41,9 +39,9 @@ public class Maintenance {
 
     // Many maintenance records belong to one flat
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "property_id", nullable = false)
+    @JoinColumn(name = "flat_id", nullable = false)
     @JsonBackReference
-    private Flat property;
+    private Flat flat;
 
     @Column(name = "amount", nullable = false)
     private Double amount;
@@ -60,4 +58,8 @@ public class Maintenance {
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
     private PaymentStatus paymentStatus;
+    
+    private String transactionId;
+
+    private String paymentProof; // file name or path
 }
