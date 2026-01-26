@@ -17,7 +17,6 @@ import Complaints from "./Pages/Complaints/Complaints";
 import AddComplaints from "./Pages/Complaints/AddComplaints";
 
 import Maintenance from "./Pages/Maintenance/Maintenance";
-import PayMaintenance from "./Pages/Maintenance/PayMaintenance";
 
 import MembersDirectory from "./Pages/MembersDirectory/MembersDirectory";
 
@@ -85,7 +84,6 @@ function App() {
 
         {/* MAINTENANCE */}
         <Route path="/maintenance" element={<Maintenance />} />
-        <Route path="/maintenance/pay" element={<PayMaintenance />} />
 
         {/* DIRECTORY */}
         <Route path="/directory" element={<MembersDirectory />} />
