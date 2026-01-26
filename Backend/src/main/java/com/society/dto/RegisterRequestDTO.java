@@ -1,18 +1,19 @@
 package com.society.dto;
 
-
-
-import lombok.Data;
 import com.society.entityenum.Role;
+import lombok.Data;
 
 @Data
 public class RegisterRequestDTO {
 
     private String firstName;
+    private String middleName;
     private String lastName;
     private String email;
-    private String password;   // plain password for now
     private String phone;
-    private Role role;
-}
+    private String password;
 
+    private Role role;        // ✅ enum, not String
+    private Integer societyId;
+    private Integer flatId;
+}

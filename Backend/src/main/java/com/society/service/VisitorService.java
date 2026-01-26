@@ -1,44 +1,25 @@
 package com.society.service;
 
-/* ========= SPRING ========= */
-import org.springframework.stereotype.Service;
-
-/* ========= JAVA ========= */
-import java.time.LocalDateTime;
 import java.util.List;
+import com.society.dto.VisitorEntryDTO;
+import com.society.dto.VisitorResponseDTO;
 
-/* ========= ENTITY ========= */
-import com.society.entity.Visitor;
+public interface VisitorService {
 
-/* ========= REPOSITORY ========= */
-import com.society.repository.VisitorRepository;
+    VisitorResponseDTO addVisitor(
+            Integer societyId,
+            Integer userId,
+            VisitorEntryDTO dto
+    );
 
-@Service
-public class VisitorService {
+    VisitorResponseDTO exitVisitor(
+            Integer societyId,
+            Integer visitorId
+    );
 
-    private final VisitorRepository visitorRepository;
+    List<VisitorResponseDTO> getInsideVisitors(Integer societyId);
 
-    public VisitorService(VisitorRepository visitorRepository) {
-        this.visitorRepository = visitorRepository;
-    }
+    List<VisitorResponseDTO> getTodayVisitors(Integer societyId);
 
-    // ================= ENTRY =================
-    public void addVisitor(Visitor visitor) {
-        visitor.setEntryTime(LocalDateTime.now()); // ✅ AUTO ENTRY TIME
-        visitorRepository.save(visitor);
-    }
-
-    // ================= EXIT =================
-    public void markExit(Integer visitorId) {
-        Visitor visitor = visitorRepository.findById(visitorId)
-                .orElseThrow(() -> new RuntimeException("Visitor not found"));
-
-        visitor.setExitTime(LocalDateTime.now()); // ✅ AUTO EXIT TIME
-        visitorRepository.save(visitor);
-    }
-
-    // ================= ADMIN =================
-    public List<Visitor> getAllVisitors() {
-        return visitorRepository.findAll();
-    }
+    List<VisitorResponseDTO> getAllVisitors(Integer societyId);
 }

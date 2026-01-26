@@ -1,20 +1,14 @@
 package com.society.repository;
 
-
-
-/* ========= SPRING DATA JPA ========= */
 import org.springframework.data.jpa.repository.JpaRepository;
-
-/* ========= JAVA ========= */
 import java.util.Optional;
-
-/* ========= ENTITY ========= */
 import com.society.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    // Find user by email (used in login & register)
+    // Used in login
     Optional<User> findByEmail(String email);
+
+    // Used in registration (BEST PRACTICE)
+    boolean existsByEmail(String email);
 }
-
-
