@@ -1,207 +1,143 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { useNavigate, Link } from "react-router-dom";
+import api from "../../services/api";
 import "./Register.css";
 
 export default function Register() {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    name: "",
+  const [form, setForm] = useState({
+    firstName: "",
+    middleName: "",
+    lastName: "",
     email: "",
     phone: "",
-    apartment: "",
     password: "",
-    confirmPassword: "",
+    societyId: "",
+    flatId: "",
   });
 
-  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // Handle input change
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors({});
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleRegister = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let newErrors = {};
+    setError("");
+    setLoading(true);
 
-    const { name, email, phone, apartment, password, confirmPassword } = formData;
+    try {
+      await api.post("/api/auth/register", {
+        firstName: form.firstName,
+        middleName: form.middleName || null,
+        lastName: form.lastName,
+        email: form.email,
+        phone: form.phone,
+        password: form.password,
 
-    // REQUIRED FIELD VALIDATIONS
-    if (!name.trim()) newErrors.name = "Full name is required";
-    if (!email.trim()) newErrors.email = "Email is required";
-    if (!phone.trim()) newErrors.phone = "Phone number is required";
-    if (!apartment.trim()) newErrors.apartment = "Apartment / Flat number is required";
-    if (!password.trim()) newErrors.password = "Password is required";
-    if (!confirmPassword.trim()) newErrors.confirmPassword = "Confirm password is required";
+        // IMPORTANT: enum value (must match Role enum)
+        role: "RESIDENT",
 
-    // EMAIL FORMAT
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (email && !emailRegex.test(email)) newErrors.email = "Invalid email format";
+        // backend expects Integer
+        societyId: Number(form.societyId),
+        flatId: Number(form.flatId),
+      });
 
-    // BLOCK ADMIN EMAIL
-    if (email === "admin@urbannest.com")
-      newErrors.email = "This email is reserved for admin.";
+      alert("Registration successful! Please login.");
+      navigate("/login");
 
-    // PHONE VALIDATION → ONLY DIGITS
-    if (phone && !/^[0-9]+$/.test(phone)) {
-      newErrors.phone = "Phone number must contain digits only";
+    } catch (err) {
+      setError(err.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
-
-    // PHONE VALIDATION → MUST BE EXACTLY 10 DIGITS
-    if (phone && phone.length !== 10) {
-      newErrors.phone = "Phone number must be exactly 10 digits";
-    }
-
-    // PASSWORD VALIDATION
-    if (password && password.length < 6)
-      newErrors.password = "Password must be at least 6 characters";
-
-    if (password !== confirmPassword)
-      newErrors.confirmPassword = "Passwords do not match";
-
-    // IF ANY ERRORS FOUND → SHOW ERROR MESSAGE
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-
-      // Show first error in toast
-      const firstError = Object.values(newErrors)[0];
-      toast.error(firstError);
-
-      return;
-    }
-
-    // CHECK IF EMAIL ALREADY REGISTERED
-    const members = JSON.parse(localStorage.getItem("members") || "[]");
-    const exists = members.find((m) => m.email === email);
-
-    if (exists) {
-      toast.error("Email already registered. Please login.");
-      return;
-    }
-
-    // SAVE MEMBER with default role="member" and status="pending"
-    const newMember = {
-      id: `member-${Date.now()}`,
-      name,
-      email,
-      phone,
-      apartment,
-      password,
-      role: "member", // Default role for all registrations
-      status: "approved", // Default status - requires admin approval
-      createdAt: new Date().toISOString(),
-    };
-
-    members.push(newMember);
-    localStorage.setItem("members", JSON.stringify(members));
-
-    toast.success("Registration successful! Your account is pending admin approval. Redirecting to login...");
-
-    setTimeout(() => navigate("/"), 2000);
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
+    <div className="register-container">
+      <form className="register-card" onSubmit={handleSubmit}>
+        <h2>Resident Registration</h2>
 
-        <h2 className="auth-title">Register</h2>
-        <p className="auth-subtitle">Create your account</p>
+        {error && <p className="error">{error}</p>}
 
-        <form className="auth-form" onSubmit={handleRegister}>
+        <input
+          name="firstName"
+          placeholder="First Name"
+          value={form.firstName}
+          onChange={handleChange}
+          required
+        />
 
-          {/* FULL NAME */}
-          <label className="auth-label">Full Name *</label>
-          <input
-            name="name"
-            className="auth-input"
-            type="text"
-            placeholder="Enter full name"
-            value={formData.name}
-            onChange={handleChange}
-          />
-          {errors.name && <p className="auth-error">{errors.name}</p>}
+        <input
+          name="middleName"
+          placeholder="Middle Name (optional)"
+          value={form.middleName}
+          onChange={handleChange}
+        />
 
-          {/* EMAIL */}
-          <label className="auth-label">Email *</label>
-          <input
-            name="email"
-            className="auth-input"
-            type="email"
-            placeholder="Enter email"
-            value={formData.email}
-            onChange={handleChange}
-          />
-          {errors.email && <p className="auth-error">{errors.email}</p>}
+        <input
+          name="lastName"
+          placeholder="Last Name"
+          value={form.lastName}
+          onChange={handleChange}
+          required
+        />
 
-          {/* PHONE */}
-          <label className="auth-label">Phone Number *</label>
-          <input
-            name="phone"
-            className="auth-input"
-            type="text"
-            placeholder="Enter 10-digit phone number"
-            value={formData.phone}
-            onChange={handleChange}
-          />
-          {errors.phone && <p className="auth-error">{errors.phone}</p>}
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+          required
+        />
 
-          {/* APARTMENT */}
-          <label className="auth-label">Apartment / Flat No *</label>
-          <input
-            name="apartment"
-            className="auth-input"
-            type="text"
-            placeholder="e.g., A-101"
-            value={formData.apartment}
-            onChange={handleChange}
-          />
-          {errors.apartment && <p className="auth-error">{errors.apartment}</p>}
+        <input
+          name="phone"
+          placeholder="Phone Number"
+          value={form.phone}
+          onChange={handleChange}
+          required
+        />
 
-          {/* PASSWORD */}
-          <label className="auth-label">Password *</label>
-          <input
-            name="password"
-            className="auth-input"
-            type="password"
-            placeholder="Enter password"
-            value={formData.password}
-            onChange={handleChange}
-          />
-          {errors.password && <p className="auth-error">{errors.password}</p>}
+        <input
+          type="number"
+          name="societyId"
+          placeholder="Society ID"
+          value={form.societyId}
+          onChange={handleChange}
+          required
+        />
 
-          {/* CONFIRM PASSWORD */}
-          <label className="auth-label">Confirm Password *</label>
-          <input
-            name="confirmPassword"
-            className="auth-input"
-            type="password"
-            placeholder="Re-enter password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-          />
-          {errors.confirmPassword && (
-            <p className="auth-error">{errors.confirmPassword}</p>
-          )}
+        <input
+          type="number"
+          name="flatId"
+          placeholder="Flat ID"
+          value={form.flatId}
+          onChange={handleChange}
+          required
+        />
 
-          {/* REGISTER BUTTON */}
-          <button className="auth-button" type="submit">
-            Register
-          </button>
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={handleChange}
+          required
+        />
 
-          {/* REDIRECT */}
-          <p className="auth-footer">
-            Already have an account?
-            <Link to="/" className="auth-link">
-              Login
-            </Link>
-          </p>
+        <button type="submit" disabled={loading}>
+          {loading ? "Registering..." : "Register"}
+        </button>
 
-        </form>
-      </div>
+        <p className="login-link">
+          Already registered? <Link to="/login">Login</Link>
+        </p>
+      </form>
     </div>
   );
 }

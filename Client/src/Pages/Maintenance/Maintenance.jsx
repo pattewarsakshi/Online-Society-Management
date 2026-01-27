@@ -8,7 +8,7 @@ export default function Maintenance() {
   if (loading) return <p>Loading...</p>;
   if (!user) return <p>Please login</p>;
 
-  return user.role === "ADMIN"
+  return user.role === "admin"
     ? <AdminMaintenance />
     : <ResidentMaintenance />;
 }

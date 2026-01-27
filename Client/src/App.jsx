@@ -1,125 +1,138 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-// AUTH PAGES
+/* ================= PUBLIC ================= */
+import Home from "./Pages/Home/Home";
 import Login from "./Pages/Login/Login";
-import Register from "./Pages/Register/Register";
-import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
+import RegisterSociety from "./Pages/Auth/RegisterSociety";
+import RegisterResident from "./Pages/Resident/RegisterResident";
 
-// DASHBOARDS
-import AdminDashboard from "./Pages/AdminDashboard/AdminDashboard";
-import MemberDashboard from "./Pages/MemberDashboard/MemberDashboard";
+/* ================= ADMIN ================= */
+import AdminDashboard from "./Pages/Admin/AdminDashboard";
+import AdminNotices from "./Pages/Admin/Notices";
 
-// MODULE PAGES
-import Notices from "./Pages/Notices/Notices";
-import AddNotices from "./Pages/Notices/AddNotices";
+/* ================= GUARD ================= */
+import GuardDashboard from "./Pages/Guard/GuardDashboard";
+import AddVisitor from "./Pages/Guard/AddVisitor";
+import InsideVisitors from "./Pages/Guard/InsideVisitors";
+import TodayVisitors from "./Pages/Guard/TodayVisitors";
 
-import Complaints from "./Pages/Complaints/Complaints";
-import AddComplaints from "./Pages/Complaints/AddComplaints";
+/* ================= RESIDENT ================= */
+import ResidentDashboard from "./Pages/Resident/ResidentDashboard";
+import ResidentBookFacility from "./Pages/Resident/Facility/ResidentBookFacility";
+import ResidentMaintenance from "./Pages/Resident/ResidentMaintenance";
+import ResidentProfile from "./Pages/Resident/ResidentProfile";
 
-import Maintenance from "./Pages/Maintenance/Maintenance";
-
-import MembersDirectory from "./Pages/MembersDirectory/MembersDirectory";
-
-import Amenities from "./Pages/Amenities/Amenities";
-import BookAmenity from "./Pages/Amenities/BookAmenity";
-
-import Events from "./Pages/Events/Events";
-import Profile from "./Pages/Profile/Profile";
-
-import VisitorsList from "./Pages/Visitors/VisitorsList";
-import AddVisitor from "./Pages/Visitors/AddVisitor";
-
-import ParkingList from "./Pages/parking/ParkingList";
-
-import DocumentsList from "./Pages/documents/DocumentsList";
-import UploadDocument from "./Pages/documents/UploadDocument"; 
-// 👆 CORRECTED — before you imported DocumentsList again by mistake
-
-import Notifications from "./Pages/notifications/Notifications";
-
-import ErrorPage from "./Pages/ErrorPage/ErrorPage";
-import PrivateRoute from "./Components/PrivateRoute";
-
-// ⭐ React Toastify
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+/* ================= SECURITY ================= */
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* AUTH ROUTES */}
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot" element={<ForgotPassword />} />
+        {/* ========= PUBLIC ========= */}
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register-society" element={<RegisterSociety />} />
+        <Route path="/resident/register" element={<RegisterResident />} />
 
-        {/* ADMIN ROUTES */}
+        {/* ========= ADMIN ========= */}
         <Route
-          path="/admin/dashboard"
+          path="/admin"
           element={
-            <PrivateRoute role="admin">
+            <ProtectedRoute role="ADMIN">
               <AdminDashboard />
-            </PrivateRoute>
+            </ProtectedRoute>
           }
         />
 
-        {/* MEMBER ROUTES */}
         <Route
-          path="/member/dashboard"
+          path="/admin/notices"
           element={
-            <PrivateRoute role="member">
-              <MemberDashboard />
-            </PrivateRoute>
+            <ProtectedRoute role="ADMIN">
+              <AdminNotices />
+            </ProtectedRoute>
           }
         />
 
-        {/* NOTICES */}
-        <Route path="/notices" element={<Notices />} />
-        <Route path="/notices/add" element={<AddNotices />} />
+        {/* ========= GUARD ========= */}
+        <Route
+          path="/guard"
+          element={
+            <ProtectedRoute role="GUARD">
+              <GuardDashboard />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* COMPLAINTS */}
-        <Route path="/complaints" element={<Complaints />} />
-        <Route path="/complaints/add" element={<AddComplaints />} />
+        <Route
+          path="/guard/add-visitor"
+          element={
+            <ProtectedRoute role="GUARD">
+              <AddVisitor />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* MAINTENANCE */}
-        <Route path="/maintenance" element={<Maintenance />} />
+        <Route
+          path="/guard/inside-visitors"
+          element={
+            <ProtectedRoute role="GUARD">
+              <InsideVisitors />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* DIRECTORY */}
-        <Route path="/directory" element={<MembersDirectory />} />
+        <Route
+          path="/guard/today-visitors"
+          element={
+            <ProtectedRoute role="GUARD">
+              <TodayVisitors />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* AMENITIES */}
-        <Route path="/amenities" element={<Amenities />} />
-        <Route path="/amenities/book" element={<BookAmenity />} />
+        {/* ========= RESIDENT ========= */}
+        <Route
+          path="/resident"
+          element={
+            <ProtectedRoute role="RESIDENT">
+              <ResidentDashboard />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* EVENTS */}
-        <Route path="/events" element={<Events />} />
+        <Route
+          path="/resident/book-facility"
+          element={
+            <ProtectedRoute role="RESIDENT">
+              <ResidentBookFacility />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* PROFILE */}
-        <Route path="/profile" element={<Profile />} />
+        <Route
+          path="/resident/maintenance"
+          element={
+            <ProtectedRoute role="RESIDENT">
+              <ResidentMaintenance />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* VISITORS */}
-        <Route path="/visitors" element={<VisitorsList />} />
-        <Route path="/visitors/add" element={<AddVisitor />} />
+        <Route
+          path="/resident/profile"
+          element={
+            <ProtectedRoute role="RESIDENT">
+              <ResidentProfile />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* PARKING */}
-        <Route path="/parking" element={<ParkingList />} />
-
-        {/* DOCUMENTS */}
-        <Route path="/documents" element={<DocumentsList />} />
-        <Route path="/documents/upload" element={<UploadDocument />} />
-
-        {/* NOTIFICATIONS */}
-        <Route path="/notifications" element={<Notifications />} />
-
-        {/* ERROR PAGE */}
-        <Route path="*" element={<ErrorPage />} />
+        {/* ========= FALLBACK ========= */}
+        <Route path="*" element={<Navigate to="/" />} />
 
       </Routes>
-
-      
-      <ToastContainer position="top-center" autoClose={1800} pauseOnHover={false} />
-
     </BrowserRouter>
   );
 }

@@ -188,3 +188,93 @@
   background: rgba(243, 16, 16, 0.2);
   color: #b91c1c;
 }
+
+.admin-form label {
+  display: block;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.admin-form input,
+.admin-form select {
+  width: 200px;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* ACTION BUTTONS (Edit / Delete / Approve) */
+.action-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  margin: 2px;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Edit Button */
+.edit-btn {
+  background-color: #3b82f6; /* blue */
+  color: white;
+}
+.edit-btn:hover {
+  background-color: #2563eb;
+  transform: scale(1.05);
+}
+
+/* Delete Button */
+.delete-btn {
+  background-color: #ef4444; /* red */
+  color: white;
+}
+.delete-btn:hover {
+  background-color: #dc2626;
+  transform: scale(1.05);
+}
+
+/* Approve Button */
+.approve-btn {
+  background-color: #10b981; /* green */
+  color: white;
+}
+.approve-btn:hover {
+  background-color: #059669;
+  transform: scale(1.05);
+}
+
+/* Table Hover Buttons */
+.maintenance-table td button {
+  min-width: 70px;
+}
+
+/* Popup Notification */
+.popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #2563eb;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  opacity: 0;
+  animation: popupFade 0.5s forwards;
+}
+
+@keyframes popupFade {
+  0% { opacity: 0; transform: translateY(-10px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* Different colors for different types */
+.popup.success { background-color: #10b981; }
+.popup.error { background-color: #ef4444; }
+.popup.info { background-color: #3b82f6; }
