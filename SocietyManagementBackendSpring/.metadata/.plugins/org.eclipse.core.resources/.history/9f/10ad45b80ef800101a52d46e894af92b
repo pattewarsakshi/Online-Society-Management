@@ -1,5 +1,0 @@
-package com.society.service;
-
-public interface ComplaintService {
-
-}

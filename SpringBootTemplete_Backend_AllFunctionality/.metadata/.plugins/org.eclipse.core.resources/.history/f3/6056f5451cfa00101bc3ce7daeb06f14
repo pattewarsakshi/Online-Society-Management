@@ -1,0 +1,97 @@
+//package com.society.controller;
+//
+//import com.society.dto.RegisterRequestDTO;
+//import com.society.dto.LoginRequestDTO;
+//import com.society.dto.LoginResponseDTO;
+//import com.society.entity.User;
+//import com.society.service.UserService;
+//
+//import jakarta.servlet.http.HttpSession;
+//
+//import lombok.RequiredArgsConstructor;
+//
+//import org.springframework.http.HttpStatus;
+//import org.springframework.http.ResponseEntity;
+//import org.springframework.web.bind.annotation.*;
+//
+//@RestController
+//@RequestMapping("/api/auth")
+//@RequiredArgsConstructor
+//@CrossOrigin
+//public class AuthController {
+//
+//    private final UserService userService;
+//
+//    @PostMapping("/register")
+//    public ResponseEntity<String> register(@RequestBody RegisterRequestDTO request) {
+//
+//        User user = userService.registerUser(request);
+//
+//        return ResponseEntity.status(HttpStatus.CREATED)
+//                .body("User registered successfully with ID: " + user.getUserId());
+//    }
+//
+//    @PostMapping("/login")
+//    public ResponseEntity<LoginResponseDTO> login(
+//            @RequestBody LoginRequestDTO request,
+//            HttpSession session) {
+//
+//        return ResponseEntity.ok(userService.loginUser(request, session));
+//    }
+//
+//    @PostMapping("/logout")
+//    public ResponseEntity<String> logout(HttpSession session) {
+//        session.invalidate();
+//        return ResponseEntity.ok("Logged out successfully");
+//    }
+//}
+package com.society.controller;
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.*;
+
+import com.society.dto.LoginRequestDTO;
+import com.society.dto.LoginResponseDTO;
+import com.society.dto.RegisterRequestDTO;
+import com.society.entity.User;
+import com.society.security.JwtUtil;
+import com.society.security.CustomUserDetailsService;
+import com.society.service.UserService;
+
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+@CrossOrigin
+public class AuthController {
+
+    private final UserService userService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
+    private final CustomUserDetailsService userDetailsService;
+
+    @PostMapping("/register")
+    public String register(@RequestBody RegisterRequestDTO request) {
+        User user = userService.registerUser(request);
+        return "User registered with ID: " + user.getUserId();
+    }
+
+    @PostMapping("/login")
+    public LoginResponseDTO login(@RequestBody LoginRequestDTO request) {
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword())
+        );
+
+        var userDetails =
+                userDetailsService.loadUserByUsername(request.getEmail());
+
+        String token = jwtUtil.generateToken(userDetails);
+
+        return new LoginResponseDTO(null, token, token, null, token);
+    }
+}

@@ -1,0 +1,14 @@
+package com.society.entity;
+
+import com.society.entityenum.ParkingType;
+
+public class ParkingChargeUtil {
+
+    public static double getParkingCharge(ParkingType type) {
+        return switch (type) {
+            case BIKE -> 300.0;
+            case CAR -> 700.0;
+            default -> 0.0;
+        };
+    }
+}
