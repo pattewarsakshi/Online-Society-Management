@@ -1,8 +1,8 @@
 package com.society.management.controller;
 
-import com.society.management.dto.AuthResponse;
-
 import com.society.management.dto.LoginRequestDto;
+import com.society.management.dto.LoginResponseDto;
+import com.society.management.dto.RegisterSuperAdminRequest;
 import com.society.management.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +16,20 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(
-            @Valid @RequestBody LoginRequestDto loginRequest) {
+    // ✅ REGISTER SUPER ADMIN
+    @PostMapping("/register-super-admin")
+    public ResponseEntity<String> registerSuperAdmin(
+            @Valid @RequestBody RegisterSuperAdminRequest request) {
 
-        return ResponseEntity.ok(authService.login(loginRequest));
+        authService.registerSuperAdmin(request);
+        return ResponseEntity.ok("SUPER_ADMIN registered successfully");
+    }
+
+    // ✅ LOGIN (JWT)
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(
+            @Valid @RequestBody LoginRequestDto request) {
+
+        return ResponseEntity.ok(authService.login(request));
     }
 }

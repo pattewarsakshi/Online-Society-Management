@@ -1,70 +1,68 @@
 package com.society.management.entity;
 
 import jakarta.persistence.*;
+
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.time.ZoneOffset;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
+
 
 /**
- * Society entity represents a housing society.
- * This class is ONLY responsible for database mapping.
+ * Society entity
+ * Represents a residential society in the system
  */
-@Entity
-@Table(name = "societies")
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "society")
 public class Society {
 
-    /**
-     * Primary key for society
-     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long societyId;
 
-    /**
-     * Name of the society
-     */
-    @Column(nullable = false, unique = true)
-    private String name;
+    @NotBlank
+    @Size(min = 3, max = 150)
+    @Column(nullable = false, length = 150)
+    private String societyName;
 
-    /**
-     * Full address of the society
-     */
+    @NotBlank
     @Column(nullable = false, length = 255)
     private String address;
 
-    @Column(nullable = false)
+    @NotBlank
+    @Column(nullable = false, length = 100)
     private String city;
 
-    @Column(nullable = false)
+    @NotBlank
+    @Column(nullable = false, length = 100)
     private String state;
 
+    @NotBlank
+    @Pattern(regexp = "^[1-9][0-9]{5}$")
     @Column(nullable = false, length = 6)
     private String pincode;
 
-    /**
-     * Timestamp when society was created
-     */
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", nullable = false)
+    private User createdBy;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    /**
-     * One society can have many users
-     */
-    @OneToMany(mappedBy = "society", fetch = FetchType.LAZY)
-    private List<User> users;
-
-    /**
-     * Automatically set creation time
-     */
     @PrePersist
     public void onCreate() {
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now(ZoneOffset.UTC);
     }
 }
-

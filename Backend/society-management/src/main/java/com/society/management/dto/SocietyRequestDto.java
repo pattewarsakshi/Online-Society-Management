@@ -1,20 +1,20 @@
 package com.society.management.dto;
 
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 /**
- * DTO used while creating or updating a society.
- * Contains input validation rules.
+ * DTO used when creating a new society
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SocietyRequestDto {
 
     @NotBlank(message = "Society name is required")
-    @Size(min = 3, max = 100, message = "Society name must be 3–100 characters")
-    private String name;
+    private String societyName;
 
     @NotBlank(message = "Address is required")
     private String address;
@@ -25,7 +25,9 @@ public class SocietyRequestDto {
     @NotBlank(message = "State is required")
     private String state;
 
-    @NotBlank(message = "Pincode is required")
-    @Pattern(regexp = "\\d{6}", message = "Pincode must be 6 digits")
+    @Pattern(
+        regexp = "^[1-9][0-9]{5}$",
+        message = "Invalid Indian pincode"
+    )
     private String pincode;
 }

@@ -1,14 +1,20 @@
 package com.society.management.service;
 
+import java.util.List;
+
 import com.society.management.dto.SocietyRequestDto;
 import com.society.management.dto.SocietyResponseDto;
 
 /**
- * Society service defines business operations related to society.
+ * Business layer for Society
  */
-
 public interface SocietyService {
-	
-	SocietyResponseDto createSociety(SocietyRequestDto requestDto);
 
+    /**
+     * Create a new society
+     * Only SUPER_ADMIN can do this
+     */
+	SocietyResponseDto createSociety(SocietyRequestDto requestDto);
+    List<SocietyResponseDto> getMySocieties();
 }
+

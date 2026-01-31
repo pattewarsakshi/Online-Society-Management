@@ -9,13 +9,13 @@ import lombok.*;
  * User entity represents all system users:
  * SUPER_ADMIN, ADMIN, OWNER, TENANT, GUARD
  */
-@Entity
-@Table(name = "users") // 'user' is reserved keyword in MySQL
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "users")
 public class User {
 
     @Id
