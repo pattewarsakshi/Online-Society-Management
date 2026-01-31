@@ -1,0 +1,33 @@
+# Maven
+/target/
+
+# IDE
+/.idea/
+/.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment files
+.env
+
+# React (later)
+node_modules/
+dist/
+
+# Eclipse / STS
+.metadata/
+.settings/
+.project
+.classpath
+
+# Maven
+target/
+
+# Logs
+*.log
