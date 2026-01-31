@@ -2,6 +2,8 @@ package com.society.management.service;
 
 import java.util.List;
 
+import com.society.management.dto.AdminCreateRequestDto;
+import com.society.management.dto.AdminResponseDto;
 import com.society.management.dto.SocietyRequestDto;
 import com.society.management.dto.SocietyResponseDto;
 
@@ -16,5 +18,7 @@ public interface SocietyService {
      */
 	SocietyResponseDto createSociety(SocietyRequestDto requestDto);
     List<SocietyResponseDto> getMySocieties();
+    AdminResponseDto createAdmin(Long societyId, AdminCreateRequestDto request);
+
 }
 

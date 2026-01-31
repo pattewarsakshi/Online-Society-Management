@@ -1,5 +1,7 @@
 package com.society.management.controller;
 
+import com.society.management.dto.AdminCreateRequestDto;
+import com.society.management.dto.AdminResponseDto;
 import com.society.management.dto.SocietyRequestDto;
 import com.society.management.dto.SocietyResponseDto;
 import com.society.management.service.SocietyService;
@@ -7,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,5 +44,16 @@ public class SocietyController {
     @GetMapping("/my")
     public List<SocietyResponseDto> getMySocieties() {
         return societyService.getMySocieties();
+    }
+    
+    @PostMapping("/{societyId}/admin")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public ResponseEntity<AdminResponseDto> createAdmin(
+            @PathVariable Long societyId,
+            @RequestBody AdminCreateRequestDto request
+    ) {
+        return ResponseEntity.ok(
+                societyService.createAdmin(societyId, request)
+        );
     }
 }

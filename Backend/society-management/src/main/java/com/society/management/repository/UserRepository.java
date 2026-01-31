@@ -1,6 +1,8 @@
 package com.society.management.repository;
 
 import com.society.management.entity.User;
+import com.society.management.enumtype.Role;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -15,4 +17,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
     
     boolean existsByPhone(String phone);
+    
+    boolean existsBySociety_SocietyIdAndRole(Long societyId, Role role);
+
+    boolean existsByEmailOrPhone(String email, String phone);
+
 }

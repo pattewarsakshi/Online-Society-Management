@@ -1,20 +1,30 @@
 package com.society.management.service.impl;
 
+import com.society.management.dto.AdminCreateRequestDto;
+import com.society.management.dto.AdminResponseDto;
 import com.society.management.dto.SocietyRequestDto;
 import com.society.management.dto.SocietyResponseDto;
 import com.society.management.entity.Society;
 import com.society.management.entity.User;
+import com.society.management.enumtype.Role;
 import com.society.management.exception.ResourceAlreadyExistsException;
 import com.society.management.repository.SocietyRepository;
 import com.society.management.repository.UserRepository;
 import com.society.management.security.CustomUserDetails;
 import com.society.management.service.SocietyService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.society.management.security.CustomUserDetails;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+
 
 
 import java.util.List;
@@ -26,6 +36,7 @@ public class SocietyServiceImpl implements SocietyService {
 
     private final SocietyRepository societyRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public SocietyResponseDto createSociety(SocietyRequestDto requestDto) {
@@ -99,6 +110,55 @@ public class SocietyServiceImpl implements SocietyService {
                         .build())
                 .toList();
     }
+    
+    @Override
+    public AdminResponseDto createAdmin(Long societyId, AdminCreateRequestDto request) {
+
+        // 1️⃣ Check society exists
+        Society society = societyRepository.findById(societyId)
+                .orElseThrow(() -> new RuntimeException("Society not found"));
+
+        // 2️⃣ One ADMIN per society check
+        boolean adminExists =
+                userRepository.existsBySociety_SocietyIdAndRole(
+                        societyId, Role.ADMIN
+                );
+
+        if (adminExists) {
+            throw new RuntimeException("Admin already exists for this society");
+        }
+
+        // 3️⃣ Email / phone uniqueness
+        if (userRepository.existsByEmailOrPhone(
+                request.getEmail(), request.getPhone())) {
+        	throw new ResponseStatusException(
+        		    HttpStatus.CONFLICT,
+        		    "Only one admin is allowed per society"
+        		);
+        }
+
+        // 4️⃣ Create ADMIN
+        User admin = User.builder()
+                .fullName(request.getFullName())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.ADMIN)
+                .society(society)
+                .build();
+
+        User savedAdmin = userRepository.save(admin);
+
+        // 5️⃣ Response
+        return AdminResponseDto.builder()
+                .userId(savedAdmin.getUserId())
+                .fullName(savedAdmin.getFullName())
+                .email(savedAdmin.getEmail())
+                .role(savedAdmin.getRole().name())
+                .societyId(societyId)
+                .build();
+    }
+
 
 
 }
