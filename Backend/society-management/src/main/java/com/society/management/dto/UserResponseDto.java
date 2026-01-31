@@ -1,13 +1,14 @@
 package com.society.management.dto;
 
 import com.society.management.enumtype.Role;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 /**
- * DTO returned after successful user registration.
+ * Output DTO (never expose password)
  */
 @Getter
+@Setter
+@AllArgsConstructor
 @Builder
 public class UserResponseDto {
 

@@ -8,32 +8,41 @@ import java.security.Key;
 import java.util.Date;
 import java.util.Map;
 
-/**
- * Utility class for generating JWT tokens.
- */
 @Component
 public class JwtUtil {
 
-    // Secret key (later move to application.properties)
-    private static final String SECRET_KEY =
-            "mysecretkeymysecretkeymysecretkeymysecretkey";
+    private static final String SECRET =
+            "my-super-secret-key-my-super-secret-key"; // min 32 chars
 
-    // Token validity: 24 hours
-    private static final long EXPIRATION_TIME = 24 * 60 * 60 * 1000;
+    private static final long EXPIRATION = 1000 * 60 * 60; // 1 hour
 
-    private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    private Key getSignKey() {
+        return Keys.hmacShaKeyFor(SECRET.getBytes());
+    }
 
-    /**
-     * Generate JWT token with claims.
-     */
-    public String generateToken(String email, Map<String, Object> claims) {
-
+    public String generateToken(String email, String role) {
         return Jwts.builder()
                 .setSubject(email)
-                .addClaims(claims)
+                .addClaims(Map.of("role", role)) // ADMIN / USER
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public String extractEmail(String token) {
+        return getClaims(token).getSubject();
+    }
+
+    public String extractRole(String token) {
+        return getClaims(token).get("role", String.class);
+    }
+
+    private Claims getClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

@@ -4,7 +4,6 @@ import com.society.management.dto.UserRegisterRequestDto;
 import com.society.management.dto.UserResponseDto;
 import com.society.management.entity.Society;
 import com.society.management.entity.User;
-import com.society.management.exception.ResourceAlreadyExistsException;
 import com.society.management.repository.SocietyRepository;
 import com.society.management.repository.UserRepository;
 import com.society.management.service.UserService;
@@ -12,9 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-/**
- * Business logic for user registration.
- */
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -23,41 +19,50 @@ public class UserServiceImpl implements UserService {
     private final SocietyRepository societyRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Override
-    public UserResponseDto registerUser(UserRegisterRequestDto requestDto) {
+    public UserResponseDto createUser(UserRegisterRequestDto request) {
 
         // Check duplicate email
-        if (userRepository.existsByEmail(requestDto.getEmail())) {
-            throw new ResourceAlreadyExistsException("Email already registered");
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already exists");
         }
 
-        // Fetch society
-        Society society = societyRepository.findById(requestDto.getSocietyId())
-                .orElseThrow(() -> new RuntimeException("Society not found"));
-
-        // Encrypt password
-        String encryptedPassword = passwordEncoder.encode(requestDto.getPassword());
+        // Fetch society if provided
+        Society society = null;
+        if (request.getSocietyId() != null) {
+            society = societyRepository.findById(request.getSocietyId())
+                    .orElseThrow(() -> new RuntimeException("Society not found"));
+        }
 
         // Build User entity
         User user = User.builder()
-                .fullName(requestDto.getFullName())
-                .email(requestDto.getEmail())
-                .phone(requestDto.getPhone())
-                .role(requestDto.getRole())
-                .password(encryptedPassword)
+                .fullName(request.getFullName())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .role(request.getRole())
+                .password(passwordEncoder.encode(request.getPassword())) // ALWAYS encode
                 .society(society)
                 .build();
 
         User savedUser = userRepository.save(user);
 
-        // Return response DTO
+        // Convert to response DTO
         return UserResponseDto.builder()
                 .userId(savedUser.getUserId())
                 .fullName(savedUser.getFullName())
                 .email(savedUser.getEmail())
                 .phone(savedUser.getPhone())
                 .role(savedUser.getRole())
-                .societyId(society.getSocietyId())
+                .societyId(
+                        savedUser.getSociety() != null
+                                ? savedUser.getSociety().getSocietyId()
+                                : null
+                )
                 .build();
     }
+
+	@Override
+	public UserResponseDto registerUser(UserRegisterRequestDto requestDto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

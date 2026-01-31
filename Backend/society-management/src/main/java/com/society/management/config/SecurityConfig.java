@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * Main security configuration.
- */
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -21,24 +21,34 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
-
-            .authorizeHttpRequests(auth -> auth
-                // Public APIs
-                .requestMatchers(
-                        "/api/auth/login",
-                        "/api/users/register"
-                ).permitAll()
-
-                // Everything else secured
-                .anyRequest().authenticated()
+            .sessionManagement(sm ->
+                sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
+            .authorizeHttpRequests(auth -> auth
+            		.requestMatchers("/api/auth/**").permitAll()
 
-            // Add JWT filter before Spring security filter
+            		.requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
+
+            		.requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+            		.requestMatchers("/api/guard/**").hasRole("GUARD")
+
+            		.requestMatchers("/api/user/**")
+            		    .hasAnyRole("OWNER", "TENANT")
+
+            		.anyRequest().authenticated()
+
+            )
             .addFilterBefore(
-                    jwtAuthenticationFilter,
-                    UsernamePasswordAuthenticationFilter.class
+                jwtAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class
             );
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

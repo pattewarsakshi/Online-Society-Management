@@ -2,34 +2,33 @@ package com.society.management.dto;
 
 import com.society.management.enumtype.Role;
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 /**
- * DTO for user registration request.
+ * Input DTO for user creation
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserRegisterRequestDto {
 
-    @NotBlank(message = "Full name is required")
+    @NotBlank
     private String fullName;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
+    @Email
+    @NotBlank
     private String email;
 
-    @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^[6-9]\\d{9}$", message = "Invalid phone number")
+    @NotBlank
     private String phone;
 
-    @NotNull(message = "Role is required")
-    private Role role;
-
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters")
+    @NotBlank
     private String password;
 
-    @NotNull(message = "Society ID is required")
+    @NotNull
+    private Role role;
+
+    // Society ID comes from client
     private Long societyId;
 }
