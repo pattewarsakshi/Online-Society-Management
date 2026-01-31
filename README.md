@@ -61,3 +61,8 @@ JWT filter → single source of authentication
 Role-based endpoints → predictable security
 
 ER integrity preserved → future modules won’t break
+
+POST /api/auth/register-super-admin  → Register Super Admin
+POST /api/auth/login                 → Login (JWT)
+POST /api/super-admin/societies      → Create Society
+
