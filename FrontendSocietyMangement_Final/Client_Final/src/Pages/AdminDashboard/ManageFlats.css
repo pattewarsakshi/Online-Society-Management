@@ -1,0 +1,25 @@
+.manage-flats-container {
+  padding: 20px;
+}
+
+.flats-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.flats-table th,
+.flats-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.status.occupied {
+  color: green;
+  font-weight: 600;
+}
+
+.status.vacant {
+  color: orange;
+  font-weight: 600;
+}
