@@ -2,7 +2,9 @@ package com.society.management.controller;
 
 import com.society.management.dto.PropertyCreateRequestDto;
 import com.society.management.dto.PropertyResponseDto;
+import com.society.management.dto.PropertyUpdateRequestDto;
 import com.society.management.dto.TenantAssignRequestDto;
+import com.society.management.entity.Property;
 import com.society.management.service.PropertyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -53,4 +55,39 @@ public class PropertyController {
         propertyService.assignTenant(propertyId, request.getTenantUserId());
         return ResponseEntity.ok("Tenant assigned successfully");
     }
+    
+    //get single property by id
+    @GetMapping("/{propertyId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PropertyResponseDto> getPropertyById(
+            @PathVariable Long societyId,
+            @PathVariable Long propertyId) {
+
+        return ResponseEntity.ok(
+                propertyService.getPropertyById(societyId, propertyId)
+        );
+    }
+    
+    @PutMapping("/{propertyId}")
+    public ResponseEntity<PropertyResponseDto> updateProperty(
+            @PathVariable Long societyId,
+            @PathVariable Long propertyId,
+            @Valid @RequestBody PropertyUpdateRequestDto dto
+    ) {
+        return ResponseEntity.ok(
+                propertyService.updateProperty(societyId, propertyId, dto)
+        );
+    }
+    
+    @DeleteMapping("/{propertyId}")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
+    public ResponseEntity<String> deleteProperty(
+            @PathVariable Long societyId,
+            @PathVariable Long propertyId) {
+
+        propertyService.deleteProperty(societyId, propertyId);
+        return ResponseEntity.ok("Property deleted successfully");
+    }
+
+
 }

@@ -3,6 +3,7 @@ package com.society.management.service.impl;
 
 import com.society.management.dto.PropertyCreateRequestDto;
 import com.society.management.dto.PropertyResponseDto;
+import com.society.management.dto.PropertyUpdateRequestDto;
 import com.society.management.entity.Property;
 import com.society.management.entity.Society;
 import com.society.management.entity.User;
@@ -27,59 +28,32 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyRepository propertyRepository;
     private final UserRepository userRepository;
     private final SocietyRepository societyRepository;
+    
     @Override
     @Transactional
     public void assignTenant(Long propertyId, Long tenantUserId) {
 
-        // 1️⃣ Property must exist
         Property property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new RuntimeException("Property not found"));
 
-        // 2️⃣ Tenant must exist
+        // ❌ Block if property is DELETED
+        if (property.getStatus() == PropertyStatus.DELETED) {
+            throw new RuntimeException("Cannot assign tenant to deleted property");
+        }
+
         User tenant = userRepository.findById(tenantUserId)
                 .orElseThrow(() -> new RuntimeException("Tenant not found"));
 
-        // 3️⃣ User must be TENANT
         if (tenant.getRole() != Role.TENANT) {
             throw new RuntimeException("User is not a TENANT");
         }
 
-        // 4️⃣ Assign tenant + update status
         property.setTenant(tenant);
         property.setStatus(PropertyStatus.OCCUPIED);
 
-        // 5️⃣ Persist
         propertyRepository.save(property);
     }
 
-    @Override
-    public List<PropertyResponseDto> getPropertiesBySociety(Long societyId) {
-        return propertyRepository.findBySociety_SocietyId(societyId)
-                .stream()
-                .map(property -> PropertyResponseDto.builder()
-                        .propertyId(property.getPropertyId())
-                        .flatNumber(property.getFlatNumber())
-                        .block(property.getBlock())
-                        .floorNumber(property.getFloorNumber())
-                        .areaSqft(property.getAreaSqft())
-                        .status(property.getStatus().name())
-                        .ownerId(property.getOwner().getUserId())
-                        .ownerName(property.getOwner().getFullName())
-                        .tenantId(
-                            property.getTenant() != null
-                                ? property.getTenant().getUserId()
-                                : null
-                        )
-                        .tenantName(
-                            property.getTenant() != null
-                                ? property.getTenant().getFullName()
-                                : null
-                        )
-                        .build()
-                )
-                .collect(Collectors.toList());
-    }
-    
     @Override
     public PropertyResponseDto addProperty(Long societyId, PropertyCreateRequestDto request) {
 
@@ -131,7 +105,103 @@ public class PropertyServiceImpl implements PropertyService {
                 .ownerName(owner.getFullName())
                 .build();
     }
+    
+    @Override
+    public PropertyResponseDto getPropertyById(Long societyId, Long propertyId) {
 
+        Property property = propertyRepository
+                .findByPropertyIdAndSociety_SocietyId(propertyId, societyId)
+                .orElseThrow(() -> new RuntimeException("Property not found"));
+
+        return mapToDto(property);
+    }
+    
+    @Override
+    @Transactional
+    public PropertyResponseDto updateProperty(
+            Long societyId,
+            Long propertyId,
+            PropertyUpdateRequestDto request) {
+
+        // 1️⃣ Property must exist AND belong to society
+        Property property = propertyRepository
+                .findByPropertyIdAndSociety_SocietyId(propertyId, societyId)
+                .orElseThrow(() -> new RuntimeException("Property not found"));
+
+        // 2️⃣ Cannot update deleted property
+        if (property.getStatus() == PropertyStatus.DELETED) {
+            throw new RuntimeException("Cannot update deleted property");
+        }
+
+        // 3️⃣ Update ONLY allowed fields
+        property.setFloorNumber(request.getFloorNumber());
+        property.setAreaSqft(request.getAreaSqft());
+
+        // 4️⃣ Persist & return
+        Property updated = propertyRepository.save(property);
+        return mapToDto(updated);
+    }
+
+    
+    @Override
+    @Transactional
+    public void deleteProperty(Long societyId, Long propertyId) {
+
+        Property property = propertyRepository
+                .findByPropertyIdAndSociety_SocietyId(propertyId, societyId)
+                .orElseThrow(() -> new RuntimeException("Property not found"));
+
+        // ❌ Cannot delete if tenant exists
+        if (property.getTenant() != null) {
+            throw new RuntimeException("Cannot delete property with assigned tenant");
+        }
+
+        // ❌ Already deleted
+        if (property.getStatus() == PropertyStatus.DELETED) {
+            throw new RuntimeException("Property already deleted");
+        }
+
+        // ✅ Soft delete
+        property.setStatus(PropertyStatus.DELETED);
+        propertyRepository.save(property);
+    }
+    
+    private PropertyResponseDto mapToDto(Property property) {
+
+        return PropertyResponseDto.builder()
+                .propertyId(property.getPropertyId())
+                .flatNumber(property.getFlatNumber())
+                .block(property.getBlock())
+                .floorNumber(property.getFloorNumber())
+                .areaSqft(property.getAreaSqft())
+                .status(property.getStatus().name())
+                .ownerId(property.getOwner().getUserId())
+                .ownerName(property.getOwner().getFullName())
+                .tenantId(
+                    property.getTenant() != null
+                        ? property.getTenant().getUserId()
+                        : null
+                )
+                .tenantName(
+                    property.getTenant() != null
+                        ? property.getTenant().getFullName()
+                        : null
+                )
+                .build();
+    }
+    
+    @Override
+    public List<PropertyResponseDto> getPropertiesBySociety(Long societyId) {
+
+        return propertyRepository
+                .findBySociety_SocietyIdAndStatusNot(
+                        societyId,
+                        PropertyStatus.DELETED
+                )
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
 
 
 
