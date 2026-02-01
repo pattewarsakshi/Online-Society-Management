@@ -14,7 +14,7 @@ import lombok.*;
 
 @Entity
 @Table(
-    name = "properties",
+    name = "property",
     uniqueConstraints = {
         @UniqueConstraint(
             columnNames = {"society_id", "flat_number", "block"}
