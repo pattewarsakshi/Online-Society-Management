@@ -50,7 +50,7 @@ public class User {
     @Size(min = 6)
     @Column(nullable = false)
     private String password;
-
+    
     // Many users belong to one society
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "society_id")

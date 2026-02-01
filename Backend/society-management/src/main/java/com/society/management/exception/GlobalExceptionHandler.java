@@ -102,6 +102,17 @@ public class GlobalExceptionHandler {
                     ex.getReason()
             ));
     }
+    
+    @ExceptionHandler(OwnerAlreadyExistsException.class)
+    public ResponseEntity<?> handleOwnerExists(OwnerAlreadyExistsException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(Map.of(
+                        "status", 409,
+                        "message", ex.getMessage(),
+                        "timestamp", LocalDateTime.now()
+                ));
+    }
 
     
 

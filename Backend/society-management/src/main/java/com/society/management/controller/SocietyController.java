@@ -1,15 +1,21 @@
 package com.society.management.controller;
 
 import com.society.management.dto.AdminCreateRequestDto;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import com.society.management.dto.AdminResponseDto;
+import com.society.management.dto.ApiResponseDto;
+import com.society.management.dto.OwnerRegisterRequestDto;
 import com.society.management.dto.SocietyRequestDto;
 import com.society.management.dto.SocietyResponseDto;
 import com.society.management.service.SocietyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -56,4 +62,14 @@ public class SocietyController {
                 societyService.createAdmin(societyId, request)
         );
     }
+    
+    @PostMapping("/{societyId}/owners")
+    public ResponseEntity<?> createOwner(
+            @PathVariable Long societyId,
+            @RequestBody @Valid OwnerRegisterRequestDto request
+    ) {
+        societyService.createOwner(societyId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
 }

@@ -1,13 +1,18 @@
 package com.society.management.service.impl;
 
 import com.society.management.dto.AdminCreateRequestDto;
+import com.society.management.exception.OwnerAlreadyExistsException;
+
 import com.society.management.dto.AdminResponseDto;
+import com.society.management.dto.OwnerRegisterRequestDto;
 import com.society.management.dto.SocietyRequestDto;
 import com.society.management.dto.SocietyResponseDto;
+import com.society.management.entity.Property;
 import com.society.management.entity.Society;
 import com.society.management.entity.User;
 import com.society.management.enumtype.Role;
 import com.society.management.exception.ResourceAlreadyExistsException;
+import com.society.management.repository.PropertyRepository;
 import com.society.management.repository.SocietyRepository;
 import com.society.management.repository.UserRepository;
 import com.society.management.security.CustomUserDetails;
@@ -15,6 +20,7 @@ import com.society.management.service.SocietyService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +43,7 @@ public class SocietyServiceImpl implements SocietyService {
     private final SocietyRepository societyRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PropertyRepository propertyRepository;
 
     @Override
     public SocietyResponseDto createSociety(SocietyRequestDto requestDto) {
@@ -158,7 +165,31 @@ public class SocietyServiceImpl implements SocietyService {
                 .societyId(societyId)
                 .build();
     }
+    
+    
+    @Override
+    public void createOwner(Long societyId, OwnerRegisterRequestDto request) {
 
+        Society society = societyRepository.findById(societyId)
+                .orElseThrow(() -> new RuntimeException("Society not found"));
 
+        if (userRepository.existsByEmailOrPhone(
+                request.getEmail(), request.getPhone())) {
+        	throw new OwnerAlreadyExistsException("Owner already exists");
+  
+        }
 
+        User owner = User.builder()
+                .fullName(request.getFullName())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.OWNER)
+                .society(society)
+                .build();
+
+        userRepository.save(owner);
+    }
+
+   
 }
