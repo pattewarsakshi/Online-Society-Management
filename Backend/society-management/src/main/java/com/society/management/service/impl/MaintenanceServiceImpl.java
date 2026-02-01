@@ -80,5 +80,25 @@ public class MaintenanceServiceImpl implements MaintenanceService {
                 m.getStatus()
         );
     }
+    
+    @Override
+    @PreAuthorize("hasRole('OWNER') or hasRole('TENANT')")
+    @Transactional(readOnly = true)
+    public List<MaintenanceResponseDto> getMyMaintenance(Long userId, String role) {
+
+        List<Maintenance> list;
+
+        if ("OWNER".equals(role)) {
+            list = maintenanceRepository.findByProperty_Owner_UserId(userId);
+        } else {
+            // TENANT path will be enabled once tenant_user_id exists
+            list = List.of();
+        }
+
+        return list.stream()
+                .map(this::mapToDto)
+                .toList();
+    }
+
 }
 

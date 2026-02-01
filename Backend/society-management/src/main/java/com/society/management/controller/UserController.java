@@ -1,5 +1,6 @@
 package com.society.management.controller;
 
+import com.society.management.dto.ResetPasswordRequestDto;
 import com.society.management.dto.UserRegisterRequestDto;
 import com.society.management.dto.UserResponseDto;
 import com.society.management.service.UserService;
@@ -30,5 +31,15 @@ public class UserController {
 
         UserResponseDto response = userService.registerUser(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+    @PutMapping("/{userId}/reset-password")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<String> resetPassword(
+            @PathVariable Long userId,
+            @Valid @RequestBody ResetPasswordRequestDto request
+    ) {
+        userService.resetPassword(userId, request.getNewPassword());
+        return ResponseEntity.ok("Password reset successfully");
     }
 }

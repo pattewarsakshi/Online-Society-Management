@@ -6,4 +6,6 @@ import com.society.management.dto.UserResponseDto;
 public interface UserService {
 
     UserResponseDto registerUser(UserRegisterRequestDto requestDto);
+    
+    void resetPassword(Long userId, String newPassword);
 }

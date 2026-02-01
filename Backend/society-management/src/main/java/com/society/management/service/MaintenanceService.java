@@ -15,4 +15,7 @@ public interface MaintenanceService {
     List<MaintenanceResponseDto> getBySociety(Long societyId);
 
     void markAsPaid(Long maintenanceId);
+    
+    
+    List<MaintenanceResponseDto> getMyMaintenance(Long userId, String role);
 }

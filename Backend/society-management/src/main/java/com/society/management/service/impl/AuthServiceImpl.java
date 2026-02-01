@@ -68,8 +68,12 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         String token = jwtUtil.generateToken(
+                user.getUserId(),
                 user.getEmail(),
-                user.getRole().name()
+                user.getRole().name(),
+                user.getSociety() != null
+                        ? user.getSociety().getSocietyId()
+                        : null
         );
 
         return LoginResponseDto.builder()

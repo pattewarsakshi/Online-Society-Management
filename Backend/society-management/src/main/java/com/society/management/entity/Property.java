@@ -51,6 +51,10 @@ public class Property {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "owner_user_id", nullable = false)
     private User owner;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tenant_user_id")
+    private User tenant;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

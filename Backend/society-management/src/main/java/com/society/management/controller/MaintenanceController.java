@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.society.management.dto.CreateMaintenanceRequestDto;
 import com.society.management.dto.MaintenanceResponseDto;
+import com.society.management.security.CustomUserDetails;
 import com.society.management.service.MaintenanceService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,5 +43,15 @@ public class MaintenanceController {
     @PutMapping("/maintenance/{id}/pay")
     public void pay(@PathVariable Long id) {
         maintenanceService.markAsPaid(id);
+    }
+    
+    @GetMapping("/my/maintenance")
+    public List<MaintenanceResponseDto> myMaintenance(
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        return maintenanceService.getMyMaintenance(
+                user.getUserId(),
+                user.getRole()
+        );
     }
 }

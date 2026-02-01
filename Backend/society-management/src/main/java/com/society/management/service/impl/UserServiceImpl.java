@@ -7,6 +7,8 @@ import com.society.management.entity.User;
 import com.society.management.repository.SocietyRepository;
 import com.society.management.repository.UserRepository;
 import com.society.management.service.UserService;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -60,9 +62,56 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-	@Override
-	public UserResponseDto registerUser(UserRegisterRequestDto requestDto) {
-		// TODO Auto-generated method stub
-		return null;
+
+
+    @Override
+    @Transactional
+    public UserResponseDto registerUser(UserRegisterRequestDto request) {
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        Society society = null;
+        if (request.getSocietyId() != null) {
+            society = societyRepository.findById(request.getSocietyId())
+                    .orElseThrow(() -> new RuntimeException("Society not found"));
+        }
+
+        User user = User.builder()
+                .fullName(request.getFullName())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .role(request.getRole())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .society(society)
+                .build();
+
+        User savedUser = userRepository.save(user);
+
+        return UserResponseDto.builder()
+                .userId(savedUser.getUserId())
+                .fullName(savedUser.getFullName())
+                .email(savedUser.getEmail())
+                .phone(savedUser.getPhone())
+                .role(savedUser.getRole())
+                .societyId(
+                        savedUser.getSociety() != null
+                                ? savedUser.getSociety().getSocietyId()
+                                : null
+                )
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(Long userId, String newPassword) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
 	}
-}
+
