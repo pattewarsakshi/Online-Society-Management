@@ -1,5 +1,6 @@
 package com.society.management.service.impl;
 
+import com.society.management.dto.MeResponseDto;
 import com.society.management.dto.UserRegisterRequestDto;
 import com.society.management.dto.UserResponseDto;
 import com.society.management.entity.Society;
@@ -113,5 +114,38 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
+    //============================================================
+    //for dashbboard purpose
+    @Override
+    public MeResponseDto getCurrentUser() {
+
+        String email = org.springframework.security.core.context
+                .SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return MeResponseDto.builder()
+                .userId(user.getUserId())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .role(user.getRole().name())
+                .societyId(
+                        user.getSociety() != null
+                                ? user.getSociety().getSocietyId()
+                                : null
+                )
+                .societyName(
+                        user.getSociety() != null
+                                ? user.getSociety().getSocietyName()
+                                : null
+                )
+                .build();
+    }
+
 	}
 

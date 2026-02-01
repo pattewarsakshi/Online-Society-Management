@@ -1,5 +1,6 @@
 package com.society.management.controller;
 
+import com.society.management.dto.MeResponseDto;
 import com.society.management.dto.ResetPasswordRequestDto;
 import com.society.management.dto.UserRegisterRequestDto;
 import com.society.management.dto.UserResponseDto;
@@ -41,5 +42,10 @@ public class UserController {
     ) {
         userService.resetPassword(userId, request.getNewPassword());
         return ResponseEntity.ok("Password reset successfully");
+    }
+    
+    @GetMapping("/me")
+    public ResponseEntity<MeResponseDto> me() {
+        return ResponseEntity.ok(userService.getCurrentUser());
     }
 }
