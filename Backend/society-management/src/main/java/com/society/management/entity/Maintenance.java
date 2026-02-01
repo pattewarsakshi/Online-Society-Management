@@ -11,7 +11,12 @@ import lombok.*;
 
 
 @Entity
-@Table(name = "maintenance")
+@Table(
+    name = "maintenance",
+    uniqueConstraints = @UniqueConstraint(
+        columnNames = {"property_id", "period_month", "period_year"}
+    )
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,20 +28,33 @@ public class Maintenance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long maintenanceId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "society_id", nullable = false)
+    private Society society;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
 
+    @Column(name = "period_month", nullable = false)
+    private Integer periodMonth;
+
+    @Column(name = "period_year", nullable = false)
+    private Integer periodYear;
+
     @Column(nullable = false)
     private BigDecimal amount;
-
-    @Column(name = "due_date", nullable = false)
-    private LocalDate dueDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MaintenanceStatus status;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(nullable = false)
+    private LocalDateTime generatedAt;
+
+    @Column(nullable = false)
+    private LocalDate dueDate;
+
+    private LocalDateTime paidAt;
 }
+

@@ -3,24 +3,26 @@ package com.society.management.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class CreateMaintenanceRequestDto {
 
-    private final BigDecimal amount;
-    private final LocalDate dueDate;
+    @NotNull
+    private Integer periodMonth;   // 1–12
 
-    public CreateMaintenanceRequestDto(
-            BigDecimal amount,
-            LocalDate dueDate
-    ) {
-        this.amount = amount;
-        this.dueDate = dueDate;
-    }
+    @NotNull
+    private Integer periodYear;    // 2025, 2026
 
-    public BigDecimal getAmount() {
-        return amount;
-    }
+    @NotNull
+    @Positive
+    private BigDecimal amount;
 
-    public LocalDate getDueDate() {
-        return dueDate;
-    }
+    @NotNull
+    private LocalDate dueDate;
 }
+

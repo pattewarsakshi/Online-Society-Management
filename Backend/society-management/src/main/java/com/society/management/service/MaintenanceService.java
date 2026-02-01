@@ -7,15 +7,19 @@ import com.society.management.dto.MaintenanceResponseDto;
 
 public interface MaintenanceService {
 
-    MaintenanceResponseDto createMaintenance(
-            Long propertyId,
+    // ADMIN
+    MaintenanceResponseDto createMaintenanceForSociety(
+            Long societyId,
             CreateMaintenanceRequestDto dto
     );
 
     List<MaintenanceResponseDto> getBySociety(Long societyId);
 
-    void markAsPaid(Long maintenanceId);
-    
-    
-    List<MaintenanceResponseDto> getMyMaintenance(Long userId, String role);
+    // OWNER
+    List<MaintenanceResponseDto> getMaintenanceForOwner(
+            Long societyId,
+            String ownerEmail
+    );
+
+    void markAsPaid(Long societyId, Long maintenanceId);
 }

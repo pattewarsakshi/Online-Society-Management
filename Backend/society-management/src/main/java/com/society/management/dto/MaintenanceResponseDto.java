@@ -2,48 +2,33 @@ package com.society.management.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.society.management.enumtype.MaintenanceStatus;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Builder
 public class MaintenanceResponseDto {
 
-    private final Long maintenanceId;
-    private final Long propertyId;
-    private final BigDecimal amount;
-    private final LocalDate dueDate;
-    private final MaintenanceStatus status;
+    private Long maintenanceId;
 
-    public MaintenanceResponseDto(
-            Long maintenanceId,
-            Long propertyId,
-            BigDecimal amount,
-            LocalDate dueDate,
-            MaintenanceStatus status
-    ) {
-        this.maintenanceId = maintenanceId;
-        this.propertyId = propertyId;
-        this.amount = amount;
-        this.dueDate = dueDate;
-        this.status = status;
-    }
+    // Property info (for UI)
+    private Long propertyId;
+    private String flatNumber;
+    private String block;
 
-    public Long getMaintenanceId() {
-        return maintenanceId;
-    }
+    // Period
+    private Integer periodMonth;
+    private Integer periodYear;
 
-    public Long getPropertyId() {
-        return propertyId;
-    }
+    private BigDecimal amount;
+    private String status;
 
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public LocalDate getDueDate() {
-        return dueDate;
-    }
-
-    public MaintenanceStatus getStatus() {
-        return status;
-    }
+    private LocalDate dueDate;
+    private LocalDateTime paidAt;
 }

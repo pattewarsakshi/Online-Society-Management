@@ -14,6 +14,9 @@ import com.society.management.dto.CreateMaintenanceRequestDto;
 import com.society.management.dto.MaintenanceResponseDto;
 import com.society.management.security.CustomUserDetails;
 import com.society.management.service.MaintenanceService;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import lombok.RequiredArgsConstructor;
@@ -24,34 +27,47 @@ import lombok.RequiredArgsConstructor;
 public class MaintenanceController {
 
     private final MaintenanceService maintenanceService;
-
-    @PostMapping("/properties/{propertyId}/maintenance")
-    public MaintenanceResponseDto create(
-            @PathVariable Long propertyId,
+    
+    
+     //=====================================================
+    @PostMapping("/societies/{societyId}/maintenance")
+    @PreAuthorize("hasRole('ADMIN')")
+    public MaintenanceResponseDto createMaintenance(
+            @PathVariable Long societyId,
             @RequestBody CreateMaintenanceRequestDto dto
     ) {
-        return maintenanceService.createMaintenance(propertyId, dto);
+        return maintenanceService.createMaintenanceForSociety(societyId, dto);
     }
 
+    //===================================================
     @GetMapping("/societies/{societyId}/maintenance")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
     public List<MaintenanceResponseDto> getBySociety(
             @PathVariable Long societyId
     ) {
         return maintenanceService.getBySociety(societyId);
     }
 
-    @PutMapping("/maintenance/{id}/pay")
-    public void pay(@PathVariable Long id) {
-        maintenanceService.markAsPaid(id);
-    }
-    
-    @GetMapping("/my/maintenance")
-    public List<MaintenanceResponseDto> myMaintenance(
-            @AuthenticationPrincipal CustomUserDetails user
+    //========================================================
+
+    @PutMapping("/societies/{societyId}/maintenance/{id}/pay")
+    @PreAuthorize("hasRole('OWNER')")
+    public void payMaintenance(
+            @PathVariable Long societyId,
+            @PathVariable Long id
     ) {
-        return maintenanceService.getMyMaintenance(
-                user.getUserId(),
-                user.getRole()
+        maintenanceService.markAsPaid(societyId, id);
+    }
+    //=========================================================
+    @GetMapping("/societies/{societyId}/maintenance/my")
+    @PreAuthorize("hasRole('OWNER')")
+    public List<MaintenanceResponseDto> getMyMaintenance(
+            @PathVariable Long societyId,
+            Authentication authentication
+    ) {
+        return maintenanceService.getMaintenanceForOwner(
+                societyId,
+                authentication.getName()
         );
     }
 }
