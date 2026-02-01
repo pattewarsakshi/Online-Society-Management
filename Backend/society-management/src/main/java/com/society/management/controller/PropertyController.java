@@ -1,5 +1,6 @@
 package com.society.management.controller;
 
+import com.society.management.dto.OwnerChangeRequestDto;
 import com.society.management.dto.PropertyCreateRequestDto;
 import com.society.management.dto.PropertyResponseDto;
 import com.society.management.dto.PropertyUpdateRequestDto;
@@ -14,6 +15,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -99,6 +101,35 @@ public class PropertyController {
         return ResponseEntity.ok("Tenant unassigned successfully");
     }
     
+    @PutMapping("/{propertyId}/change-owner")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> changeOwner(
+            @PathVariable("societyId") Long societyId,
+            @PathVariable("propertyId") Long propertyId,
+            @Valid @RequestBody OwnerChangeRequestDto request) {
+
+        propertyService.changeOwner(
+                societyId,
+                propertyId,
+                request.getNewOwnerUserId()
+        );
+
+        return ResponseEntity.ok("Owner changed successfully");
+    }
+    
+    @GetMapping("/my")
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<List<PropertyResponseDto>> getMyProperties(
+            Authentication authentication) {
+
+        String email = authentication.getName();
+        return ResponseEntity.ok(
+                propertyService.getPropertiesForOwner(email)
+        );
+    }
+
+
+
 
 
 

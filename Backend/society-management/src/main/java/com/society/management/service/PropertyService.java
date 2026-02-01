@@ -30,6 +30,9 @@ public interface PropertyService {
     void unassignTenant(Long societyId, Long propertyId);
     
 
+    void changeOwner(Long societyId, Long propertyId, Long newOwnerUserId);
+    
+    List<PropertyResponseDto> getPropertiesForOwner(String ownerEmail);
 
 
 }

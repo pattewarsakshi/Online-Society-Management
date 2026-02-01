@@ -226,6 +226,47 @@ public class PropertyServiceImpl implements PropertyService {
         propertyRepository.save(property);
     }
 
+    @Override
+    @Transactional
+    public void changeOwner(Long societyId, Long propertyId, Long newOwnerUserId) {
+
+        Property property = propertyRepository
+                .findByPropertyIdAndSociety_SocietyId(propertyId, societyId)
+                .orElseThrow(() -> new RuntimeException("Property not found"));
+
+        if (property.getStatus() == PropertyStatus.DELETED) {
+            throw new RuntimeException("Cannot change owner of deleted property");
+        }
+
+        User newOwner = userRepository.findById(newOwnerUserId)
+                .orElseThrow(() -> new RuntimeException("Owner not found"));
+
+        if (newOwner.getRole() != Role.OWNER) {
+            throw new RuntimeException("User is not an OWNER");
+        }
+
+        property.setOwner(newOwner);
+        propertyRepository.save(property);
+    }
+    
+    
+    @Override
+    public List<PropertyResponseDto> getPropertiesForOwner(String ownerEmail) {
+
+        User owner = userRepository.findByEmail(ownerEmail)
+                .orElseThrow(() -> new RuntimeException("Owner not found"));
+
+        return propertyRepository
+                .findByOwner_UserIdAndStatusNot(
+                        owner.getUserId(),
+                        PropertyStatus.DELETED
+                )
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+
 
 
 

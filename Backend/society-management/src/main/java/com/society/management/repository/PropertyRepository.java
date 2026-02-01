@@ -29,6 +29,12 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 	        Long societyId,
 	        PropertyStatus status
 	);
+	
+	List<Property> findByOwner_UserIdAndStatusNot(
+	        Long ownerUserId,
+	        PropertyStatus status
+	);
+
 
 
 	
