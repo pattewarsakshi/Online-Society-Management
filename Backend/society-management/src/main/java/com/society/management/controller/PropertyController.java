@@ -88,6 +88,20 @@ public class PropertyController {
         propertyService.deleteProperty(societyId, propertyId);
         return ResponseEntity.ok("Property deleted successfully");
     }
+    
+    @PutMapping("/{propertyId}/unassign-tenant")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> unassignTenant(
+            @PathVariable Long societyId,
+            @PathVariable Long propertyId) {
+
+        propertyService.unassignTenant(societyId, propertyId);
+        return ResponseEntity.ok("Tenant unassigned successfully");
+    }
+    
+
+
+
 
 
 }

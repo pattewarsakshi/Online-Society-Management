@@ -26,6 +26,10 @@ public interface PropertyService {
     );
 
     void deleteProperty(Long societyId, Long propertyId);
+    
+    void unassignTenant(Long societyId, Long propertyId);
+    
+
 
 
 }

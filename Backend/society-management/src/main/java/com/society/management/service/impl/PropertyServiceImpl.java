@@ -202,6 +202,30 @@ public class PropertyServiceImpl implements PropertyService {
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
+    
+    
+    @Override
+    @Transactional
+    public void unassignTenant(Long societyId, Long propertyId) {
+
+        Property property = propertyRepository
+                .findByPropertyIdAndSociety_SocietyId(propertyId, societyId)
+                .orElseThrow(() -> new RuntimeException("Property not found"));
+
+        if (property.getStatus() == PropertyStatus.DELETED) {
+            throw new RuntimeException("Cannot unassign tenant from deleted property");
+        }
+
+        if (property.getTenant() == null) {
+            throw new RuntimeException("No tenant assigned to this property");
+        }
+
+        property.setTenant(null);
+        property.setStatus(PropertyStatus.VACANT);
+
+        propertyRepository.save(property);
+    }
+
 
 
 
