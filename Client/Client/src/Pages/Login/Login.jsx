@@ -21,6 +21,8 @@ export default function Login() {
       navigate("/admin/dashboard", { replace: true });
     } else if (user.role === "RESIDENT") {
       navigate("/member/dashboard", { replace: true });
+    } else if (user.role === "GUARD") {
+      navigate("/guard/dashboard", { replace: true });
     }
   }, [user, navigate]);
 
@@ -28,7 +30,7 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // 🔹 Basic frontend validation
+    // 🔹 Frontend validation
     const newErrors = {};
     if (!email.trim()) newErrors.email = "Email is required";
     if (!password.trim()) newErrors.password = "Password is required";
@@ -46,19 +48,25 @@ export default function Login() {
 
     try {
       // 🔹 Call backend login API
-      const response = await api.post("/api/auth/login", { email, password });
+      const response = await api.post("/api/auth/login", {
+        email,
+        password
+      });
+
       const loggedUser = response.data;
 
       // 🔹 Save user in AuthContext
       login(loggedUser);
 
       toast.success("Login successful!");
-      
-      // 🔹 Redirect manually (optional, useEffect will also redirect)
+
+      // 🔹 Redirect based on role
       if (loggedUser.role === "ADMIN") {
         navigate("/admin/dashboard");
       } else if (loggedUser.role === "RESIDENT") {
         navigate("/member/dashboard");
+      } else if (loggedUser.role === "GUARD") {
+        navigate("/guard/dashboard");
       }
 
     } catch (error) {
@@ -90,7 +98,9 @@ export default function Login() {
               setErrors({});
             }}
           />
-          {errors.email && <p className="auth-error">{errors.email}</p>}
+          {errors.email && (
+            <p className="auth-error">{errors.email}</p>
+          )}
 
           {/* PASSWORD */}
           <label className="auth-label">Password *</label>
@@ -104,7 +114,9 @@ export default function Login() {
               setErrors({});
             }}
           />
-          {errors.password && <p className="auth-error">{errors.password}</p>}
+          {errors.password && (
+            <p className="auth-error">{errors.password}</p>
+          )}
 
           {/* FORGOT PASSWORD */}
           <div className="auth-forgot">
@@ -126,8 +138,15 @@ export default function Login() {
         </form>
 
         <div className="auth-demo-info">
-          <p><strong>Admin Login:</strong> admin@urbannest.com / admin123</p>
-          <p><strong>Member Login:</strong> Use any registered email (must be approved)</p>
+          <p>
+            <strong>Admin Login:</strong> admin@urbannest.com / admin123
+          </p>
+          <p>
+            <strong>Member Login:</strong> Approved resident account
+          </p>
+          <p>
+            <strong>Guard Login:</strong> Guard credentials
+          </p>
         </div>
       </div>
     </div>

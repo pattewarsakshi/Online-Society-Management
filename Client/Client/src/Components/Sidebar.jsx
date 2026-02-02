@@ -47,7 +47,8 @@ export default function Sidebar({ isOpen = true }) {
     { path: "/maintenance", label: "Maintenance", icon: "maintenance" },
     { path: "/admin/amenities", label: "Amenities", icon: "amenities" },
     { path: "/admin/bookings", label: "Amenity Bookings", icon: "calendar" },
-    // { path: "/visitors", label: "Visitors", icon: "visitors" },
+    { path: "/admin/visitors", label: "Visitors", icon: "visitors" },
+    
     // { path: "/parking", label: "Parking", icon: "parking" },
     // { path: "/documents", label: "Documents", icon: "documents" },
     // { path: "/notifications", label: "Notifications", icon: "notifications" },

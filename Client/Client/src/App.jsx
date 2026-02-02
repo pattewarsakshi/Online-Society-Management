@@ -1,19 +1,19 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-// AUTH PAGES
+/* ================= AUTH PAGES ================= */
 import Login from "./Pages/Login/Login";
 import Register from "./Pages/Register/Register";
 import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
 
-// ADMIN DASHBOARDS
+/* ================= ADMIN ================= */
 import AdminDashboard from "./Pages/AdminDashboard/AdminDashboard";
 import ApproveUsers from "./Pages/AdminDashboard/ApproveUsers";
 import ManageFlats from "./Pages/AdminDashboard/ManageFlats";
 
-// RESIDENT DASHBOARDS
+/* ================= MEMBER ================= */
 import MemberDashboard from "./Pages/MemberDashboard/MemberDashboard";
 
-// MODULE PAGES
+/* ================= MODULE PAGES ================= */
 import Notices from "./Pages/Notices/Notices";
 import AddNotices from "./Pages/Notices/AddNotices";
 
@@ -21,32 +21,36 @@ import Complaints from "./Pages/Complaints/Complaints";
 import AddComplaints from "./Pages/Complaints/AddComplaints";
 
 import Maintenance from "./Pages/Maintenance/Maintenance";
-
 import MembersDirectory from "./Pages/MembersDirectory/MembersDirectory";
 
-// AMENITIES
+/* ================= AMENITIES ================= */
 import AdminAmenities from "./Pages/Amenities/AdminAmenities/AdminAmenities";
-import AdminBookings from "./Pages/Amenities/AdminAmenities/AdminBookings"; // ✅ ADDED
+import AdminBookings from "./Pages/Amenities/AdminAmenities/AdminBookings";
 import ResidentAmenities from "./Pages/Amenities/ResidentAmenities";
 import MyBookings from "./Pages/Amenities/MyBookings";
 
+/* ================= OTHER ================= */
 import Profile from "./Pages/Profile/Profile";
-
 import VisitorsList from "./Pages/Visitors/VisitorsList";
 import AddVisitor from "./Pages/Visitors/AddVisitor";
-
 import ParkingList from "./Pages/parking/ParkingList";
 
 import DocumentsList from "./Pages/documents/DocumentsList";
-import UploadDocument from "./Pages/documents/UploadDocument"; 
+import UploadDocument from "./Pages/documents/UploadDocument";
 
 import Notifications from "./Pages/notifications/Notifications";
-
 import ErrorPage from "./Pages/ErrorPage/ErrorPage";
+import AdminVisitors from "./Pages/AdminVisitors";
+/* ================= GUARD ================= */
+import GuardDashboard from "./Pages/Guard/GuardDashboard";
+import AddVisitorGuard from "./Pages/Guard/AddVisitor";
+import InsideVisitors from "./Pages/Guard/InsideVisitors";
+import TodayVisitors from "./Pages/Guard/TodayVisitors";
+
+/* ================= COMMON ================= */
 import PrivateRoute from "./Components/PrivateRoute";
 
-
-// ⭐ React Toastify
+/* ================= TOAST ================= */
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -55,12 +59,12 @@ function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* AUTH ROUTES */}
+        {/* ================= AUTH ================= */}
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot" element={<ForgotPassword />} />
 
-        {/* ADMIN ROUTES */}
+        {/* ================= ADMIN ================= */}
         <Route
           path="/admin/dashboard"
           element={
@@ -69,12 +73,22 @@ function App() {
             </PrivateRoute>
           }
         />
+        // ADMIN VISITORS
+
+
+<Route
+  path="/admin/visitors"
+  element={
+    <PrivateRoute role="ADMIN">
+      <AdminVisitors />
+    </PrivateRoute>
+  }
+/>
+
         <Route path="/admin/approve-users" element={<ApproveUsers />} />
         <Route path="/admin/manage-flats" element={<ManageFlats />} />
 
-
-
-        {/* MEMBER ROUTES */}
+        {/* ================= MEMBER ================= */}
         <Route
           path="/member/dashboard"
           element={
@@ -84,21 +98,58 @@ function App() {
           }
         />
 
-        {/* NOTICES */}
+        {/* ================= GUARD ================= */}
+        <Route
+          path="/guard/dashboard"
+          element={
+            <PrivateRoute role="GUARD">
+              <GuardDashboard />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/guard/add-visitor"
+          element={
+            <PrivateRoute role="GUARD">
+              <AddVisitorGuard />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/guard/inside-visitors"
+          element={
+            <PrivateRoute role="GUARD">
+              <InsideVisitors />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/guard/today-visitors"
+          element={
+            <PrivateRoute role="GUARD">
+              <TodayVisitors />
+            </PrivateRoute>
+          }
+        />
+
+        {/* ================= NOTICES ================= */}
         <Route path="/notices" element={<Notices />} />
         <Route path="/notices/add" element={<AddNotices />} />
 
-        {/* COMPLAINTS */}
+        {/* ================= COMPLAINTS ================= */}
         <Route path="/complaints" element={<Complaints />} />
         <Route path="/complaints/add" element={<AddComplaints />} />
 
-        {/* MAINTENANCE */}
+        {/* ================= MAINTENANCE ================= */}
         <Route path="/maintenance" element={<Maintenance />} />
 
-        {/* DIRECTORY */}
+        {/* ================= DIRECTORY ================= */}
         <Route path="/directory" element={<MembersDirectory />} />
 
-        {/* AMENITIES */}
+        {/* ================= AMENITIES ================= */}
         <Route
           path="/admin/amenities"
           element={
@@ -107,6 +158,7 @@ function App() {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/admin/bookings"
           element={
@@ -115,6 +167,7 @@ function App() {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/amenities"
           element={
@@ -123,6 +176,7 @@ function App() {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/amenities/my-bookings"
           element={
@@ -132,31 +186,33 @@ function App() {
           }
         />
 
-        {/* PROFILE */}
+        {/* ================= PROFILE ================= */}
         <Route path="/profile" element={<Profile />} />
 
-        {/* VISITORS */}
+        {/* ================= VISITORS (OLD) ================= */}
         <Route path="/visitors" element={<VisitorsList />} />
         <Route path="/visitors/add" element={<AddVisitor />} />
 
-        {/* PARKING */}
+        {/* ================= PARKING ================= */}
         <Route path="/parking" element={<ParkingList />} />
 
-        {/* DOCUMENTS */}
+        {/* ================= DOCUMENTS ================= */}
         <Route path="/documents" element={<DocumentsList />} />
         <Route path="/documents/upload" element={<UploadDocument />} />
 
-        {/* NOTIFICATIONS */}
+        {/* ================= NOTIFICATIONS ================= */}
         <Route path="/notifications" element={<Notifications />} />
 
-        {/* ERROR PAGE */}
+        {/* ================= ERROR ================= */}
         <Route path="*" element={<ErrorPage />} />
 
       </Routes>
 
-      
-      <ToastContainer position="top-center" autoClose={1800} pauseOnHover={false} />
-
+      <ToastContainer
+        position="top-center"
+        autoClose={1800}
+        pauseOnHover={false}
+      />
     </BrowserRouter>
   );
 }
