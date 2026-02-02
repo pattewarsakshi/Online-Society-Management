@@ -92,16 +92,20 @@ public class GlobalExceptionHandler {
     }
     
     @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<ApiError> handleResponseStatusException(
+    public ResponseEntity<ErrorResponse> handleResponseStatusException(
             ResponseStatusException ex
     ) {
+        ErrorResponse response = ErrorResponse.builder()
+                .status(ex.getStatusCode().value())
+                .message(ex.getReason())
+                .timestamp(LocalDateTime.now())
+                .build();
+
         return ResponseEntity
-            .status(ex.getStatusCode())
-            .body(new ApiError(
-                    ex.getStatusCode().value(),
-                    ex.getReason()
-            ));
+                .status(ex.getStatusCode())
+                .body(response);
     }
+
     
     @ExceptionHandler(OwnerAlreadyExistsException.class)
     public ResponseEntity<?> handleOwnerExists(OwnerAlreadyExistsException ex) {
@@ -128,6 +132,9 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .body(response);
     }
+    
+   
+
 
 
     

@@ -1,5 +1,6 @@
 package com.society.management.service.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,6 +17,9 @@ import com.society.management.repository.AmenityBookingRepository;
 import com.society.management.repository.AmenityRepository;
 import com.society.management.repository.UserRepository;
 import com.society.management.service.AmenityBookingService;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -159,6 +163,30 @@ public class AmenityBookingServiceImpl implements AmenityBookingService {
         booking.setStatus(BookingStatus.CANCELLED);
         bookingRepository.save(booking);
     }
+    
+    //=====================================================
+    @Override
+    @Transactional
+    public void cancelBooking(Long bookingId, Long userId) {
+
+        AmenityBooking booking = bookingRepository
+                .findByBookingIdAndBookedBy_UserId(bookingId, userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Booking not found"
+                ));
+
+        if (booking.getStatus() == BookingStatus.CANCELLED) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Booking already cancelled"
+            );
+        }
+
+        booking.setStatus(BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
+    }
+
 
 
 }

@@ -48,4 +48,8 @@ List<AmenityBooking> findByAmenity_AmenityIdAndBookingDateAndStatus(
         LocalDate bookingDate,
         BookingStatus status
 );
+Optional<AmenityBooking> findByBookingIdAndBookedBy_UserId(
+	    Long bookingId,
+	    Long userId
+	);
 }

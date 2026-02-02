@@ -25,6 +25,9 @@ public interface AmenityBookingService {
             Long bookingId,
             String userEmail
     );
+    
+    void cancelBooking(Long bookingId, Long userId);
+
 
 
 }
