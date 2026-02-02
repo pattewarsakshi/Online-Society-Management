@@ -1,6 +1,7 @@
 package com.society.management.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -59,5 +60,6 @@ boolean existsByAmenity_AmenityIdAndBookingDateAndStatusAndStartTimeLessThanAndE
         LocalTime endTime,
         LocalTime startTime
 );
+List<AmenityBooking> findByStatusAndEndTimeBefore(BookingStatus booked, LocalTime now);
 
 }

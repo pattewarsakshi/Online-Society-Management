@@ -2,6 +2,7 @@ package com.society.management.service.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -38,6 +39,28 @@ public class AmenityBookingServiceImpl implements AmenityBookingService {
             CreateAmenityBookingDto dto,
             String userEmail
     ) {
+    	
+    	LocalDate today = LocalDate.now();
+    	LocalTime now = LocalTime.now();
+
+    	// ❌ Past date
+    	if (dto.getBookingDate().isBefore(today)) {
+    	    throw new ResponseStatusException(
+    	            HttpStatus.BAD_REQUEST,
+    	            "Cannot book for a past date"
+    	    );
+    	}
+
+    	// ❌ Today but past time
+    	if (dto.getBookingDate().isEqual(today)
+    	        && !dto.getStartTime().isAfter(now)) {
+
+    	    throw new ResponseStatusException(
+    	            HttpStatus.BAD_REQUEST,
+    	            "Cannot book a past time slot"
+    	    );
+    	}
+
 
         // 1️⃣ User must exist
         User user = userRepository.findByEmail(userEmail)
@@ -203,7 +226,24 @@ public class AmenityBookingServiceImpl implements AmenityBookingService {
         booking.setStatus(BookingStatus.CANCELLED);
         bookingRepository.save(booking);
     }
+    //============================================================
+    @Transactional
+    public void completeExpiredBookings() {
+
+        List<AmenityBooking> expired =
+        		bookingRepository.findByStatusAndEndTimeBefore(
+        		        BookingStatus.BOOKED,
+        		        LocalTime.now()       // ✅ MATCHES ENTITY
+        		);
 
 
+        for (AmenityBooking booking : expired) {
+            booking.setStatus(BookingStatus.COMPLETED);
+        }
+
+        bookingRepository.saveAll(expired);
+    }
+    
+    //==============================================
 
 }

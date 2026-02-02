@@ -27,7 +27,8 @@ public interface AmenityBookingService {
     );
     
     void cancelBooking(Long bookingId, Long userId);
-
+     
+    void completeExpiredBookings();
 
 
 }
