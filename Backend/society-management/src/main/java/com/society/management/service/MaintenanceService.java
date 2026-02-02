@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.society.management.dto.CreateMaintenanceRequestDto;
 import com.society.management.dto.MaintenanceResponseDto;
+import com.society.management.dto.MaintenanceSummaryDto;
 
 public interface MaintenanceService {
 
@@ -22,4 +23,7 @@ public interface MaintenanceService {
     );
 
     void markAsPaid(Long societyId, Long maintenanceId);
+    
+    MaintenanceSummaryDto getMaintenanceSummary(Long societyId);
+
 }

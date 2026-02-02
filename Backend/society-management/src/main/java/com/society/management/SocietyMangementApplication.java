@@ -2,6 +2,7 @@ package com.society.management;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 
 @SpringBootApplication(
@@ -9,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 	        org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration.class
 	    }
 	)
+@EnableScheduling
 	public class SocietyMangementApplication {
 
 	    public static void main(String[] args) {

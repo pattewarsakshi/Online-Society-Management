@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.society.management.dto.CreateMaintenanceRequestDto;
 import com.society.management.dto.MaintenanceResponseDto;
+import com.society.management.dto.MaintenanceSummaryDto;
 import com.society.management.security.CustomUserDetails;
 import com.society.management.service.MaintenanceService;
 
@@ -70,4 +71,14 @@ public class MaintenanceController {
                 authentication.getName()
         );
     }
+    
+    //====================================================
+    @GetMapping("/societies/{societyId}/maintenance/summary")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
+    public MaintenanceSummaryDto getMaintenanceSummary(
+            @PathVariable Long societyId
+    ) {
+        return maintenanceService.getMaintenanceSummary(societyId);
+    }
+
 }

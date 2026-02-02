@@ -1,11 +1,13 @@
 package com.society.management.service.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 import com.society.management.dto.CreateMaintenanceRequestDto;
 import com.society.management.dto.MaintenanceResponseDto;
+import com.society.management.dto.MaintenanceSummaryDto;
 import com.society.management.entity.Maintenance;
 import com.society.management.entity.Property;
 import com.society.management.entity.Society;
@@ -147,19 +150,34 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         Maintenance maintenance = maintenanceRepository.findById(maintenanceId)
                 .orElseThrow(() -> new RuntimeException("Maintenance not found"));
 
+        // 1️⃣ Society validation
         if (!maintenance.getSociety().getSocietyId().equals(societyId)) {
             throw new RuntimeException("Invalid society maintenance");
         }
 
+        // 2️⃣ Status validation
         if (maintenance.getStatus() == MaintenanceStatus.PAID) {
             throw new RuntimeException("Maintenance already paid");
         }
 
+        // 3️⃣ Ownership validation
+        Property property = maintenance.getProperty();
+        User owner = property.getOwner();
+
+        String loggedInEmail =
+                SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if (!owner.getEmail().equals(loggedInEmail)) {
+            throw new RuntimeException("You are not allowed to pay this maintenance");
+        }
+
+        // 4️⃣ Mark as PAID
         maintenance.setStatus(MaintenanceStatus.PAID);
         maintenance.setPaidAt(LocalDateTime.now());
 
         maintenanceRepository.save(maintenance);
     }
+
 //==================================================================
     private MaintenanceResponseDto mapToDto(Maintenance m) {
         return MaintenanceResponseDto.builder()
@@ -173,6 +191,58 @@ public class MaintenanceServiceImpl implements MaintenanceService {
                 .status(m.getStatus().name())
                 .dueDate(m.getDueDate())
                 .paidAt(m.getPaidAt())
+                .build();
+    }
+ //====================================================================
+    @Override
+    public MaintenanceSummaryDto getMaintenanceSummary(Long societyId) {
+
+        long total = maintenanceRepository.countBySociety_SocietyId(societyId);
+
+        long pending = maintenanceRepository
+                .countBySociety_SocietyIdAndStatus(
+                        societyId,
+                        MaintenanceStatus.PENDING
+                );
+
+        long overdue = maintenanceRepository
+                .countBySociety_SocietyIdAndStatus(
+                        societyId,
+                        MaintenanceStatus.OVERDUE
+                );
+
+        long paid = maintenanceRepository
+                .countBySociety_SocietyIdAndStatus(
+                        societyId,
+                        MaintenanceStatus.PAID
+                );
+
+        BigDecimal pendingAmt =
+                maintenanceRepository.sumAmountBySocietyAndStatus(
+                        societyId,
+                        MaintenanceStatus.PENDING
+                );
+
+        BigDecimal overdueAmt =
+                maintenanceRepository.sumAmountBySocietyAndStatus(
+                        societyId,
+                        MaintenanceStatus.OVERDUE
+                );
+
+        BigDecimal paidAmt =
+                maintenanceRepository.sumAmountBySocietyAndStatus(
+                        societyId,
+                        MaintenanceStatus.PAID
+                );
+
+        return MaintenanceSummaryDto.builder()
+                .totalCount(total)
+                .pendingCount(pending)
+                .overdueCount(overdue)
+                .paidCount(paid)
+                .pendingAmount(pendingAmt)
+                .overdueAmount(overdueAmt)
+                .paidAmount(paidAmt)
                 .build();
     }
 
