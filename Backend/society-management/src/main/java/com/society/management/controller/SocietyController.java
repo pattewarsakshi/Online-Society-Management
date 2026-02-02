@@ -71,5 +71,13 @@ public class SocietyController {
         societyService.createOwner(societyId, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
+    //========================================================
+    @GetMapping("/{societyId}")
+    public ResponseEntity<SocietyResponseDto> getSocietyById(
+            @PathVariable Long societyId
+    ) {
+        return ResponseEntity.ok(
+                societyService.getSocietyById(societyId)
+        );
+    }
 }

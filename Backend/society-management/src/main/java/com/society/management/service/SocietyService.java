@@ -22,6 +22,7 @@ public interface SocietyService {
     List<SocietyResponseDto> getMySocieties();
     AdminResponseDto createAdmin(Long societyId, AdminCreateRequestDto request);
     void createOwner(Long societyId, OwnerRegisterRequestDto request);
+    SocietyResponseDto getSocietyById(Long societyId);
 
 
 }

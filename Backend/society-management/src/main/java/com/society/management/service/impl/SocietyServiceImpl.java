@@ -190,6 +190,23 @@ public class SocietyServiceImpl implements SocietyService {
 
         userRepository.save(owner);
     }
+    
+    @Override
+    public SocietyResponseDto getSocietyById(Long societyId) {
+
+        Society society = societyRepository.findById(societyId)
+                .orElseThrow(() -> new RuntimeException("Society not found"));
+
+        SocietyResponseDto dto = new SocietyResponseDto();
+        dto.setSocietyId(society.getSocietyId());
+        dto.setSocietyName(society.getSocietyName());
+        dto.setAddress(society.getAddress());
+        dto.setCity(society.getCity());
+        dto.setState(society.getState());
+
+        return dto;
+    }
+
 
    
 }
