@@ -52,4 +52,12 @@ Optional<AmenityBooking> findByBookingIdAndBookedBy_UserId(
 	    Long bookingId,
 	    Long userId
 	);
+boolean existsByAmenity_AmenityIdAndBookingDateAndStatusAndStartTimeLessThanAndEndTimeGreaterThan(
+        Long amenityId,
+        LocalDate bookingDate,
+        BookingStatus status,
+        LocalTime endTime,
+        LocalTime startTime
+);
+
 }

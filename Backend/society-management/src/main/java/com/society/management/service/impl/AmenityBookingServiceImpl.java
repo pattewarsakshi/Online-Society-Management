@@ -81,6 +81,23 @@ public class AmenityBookingServiceImpl implements AmenityBookingService {
                 .status(BookingStatus.CREATED)
                 .createdAt(LocalDateTime.now())
                 .build();
+        
+        boolean conflict =
+                bookingRepository.existsByAmenity_AmenityIdAndBookingDateAndStatusAndStartTimeLessThanAndEndTimeGreaterThan(
+                        amenity.getAmenityId(),
+                        dto.getBookingDate(),
+                        BookingStatus.BOOKED,
+                        dto.getEndTime(),
+                        dto.getStartTime()
+                );
+
+        if (conflict) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Amenity already booked for this time slot"
+            );
+        }
+
 
         AmenityBooking saved = bookingRepository.save(booking);
 
