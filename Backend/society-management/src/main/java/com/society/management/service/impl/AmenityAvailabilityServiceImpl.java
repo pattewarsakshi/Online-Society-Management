@@ -1,4 +1,7 @@
 package com.society.management.service.impl;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -34,23 +37,26 @@ public class AmenityAvailabilityServiceImpl
         // 1️⃣ Validate amenity belongs to society
         Amenity amenity = amenityRepository
                 .findByAmenityIdAndSociety_SocietyId(amenityId, societyId)
-                .orElseThrow(() -> new RuntimeException("Amenity not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Amenity not found"
+                ));
 
-        // 2️⃣ Fetch existing bookings
+        // 2️⃣ Fetch ACTIVE bookings (CREATED)
         List<AmenityBooking> bookings =
-        		amenityBookingRepository.findByAmenity_AmenityIdAndBookingDateAndStatus(
-        		        amenityId,
-        		        date,
-        		        BookingStatus.CONFIRMED
-        		);
+                amenityBookingRepository.findConflictingBookings(
+                        amenityId,
+                        date,
+                        LocalTime.MIN,
+                        LocalTime.MAX
+                );
 
-
-        // 3️⃣ Sort bookings by start time
+        // 3️⃣ Sort by start time
         bookings.sort(Comparator.comparing(AmenityBooking::getStartTime));
 
         List<TimeSlotDto> available = new ArrayList<>();
 
-        LocalTime current = LocalTime.of(6, 0); // opening time
+        LocalTime current = LocalTime.of(6, 0);
         LocalTime closing = LocalTime.of(23, 0);
 
         for (AmenityBooking b : bookings) {
@@ -69,5 +75,6 @@ public class AmenityAvailabilityServiceImpl
 
         return available;
     }
+
 }
 

@@ -13,6 +13,7 @@ import com.society.management.dto.CreateAmenityBookingDto;
 import com.society.management.entity.Amenity;
 import com.society.management.entity.AmenityBooking;
 import com.society.management.entity.User;
+import com.society.management.enumtype.AmenityStatus;
 import com.society.management.enumtype.BookingStatus;
 import com.society.management.repository.AmenityBookingRepository;
 import com.society.management.repository.AmenityRepository;
@@ -31,6 +32,8 @@ public class AmenityBookingServiceImpl implements AmenityBookingService {
     private final AmenityRepository amenityRepository;
     private final AmenityBookingRepository bookingRepository;
     private final UserRepository userRepository;
+    
+    //==================================================================
 
     @Override
     @Transactional
@@ -39,61 +42,59 @@ public class AmenityBookingServiceImpl implements AmenityBookingService {
             CreateAmenityBookingDto dto,
             String userEmail
     ) {
-    	
-    	LocalDate today = LocalDate.now();
-    	LocalTime now = LocalTime.now();
 
-    	// ❌ Past date
-    	if (dto.getBookingDate().isBefore(today)) {
-    	    throw new ResponseStatusException(
-    	            HttpStatus.BAD_REQUEST,
-    	            "Cannot book for a past date"
-    	    );
-    	}
+        // 1️⃣ Validate time & date (fast fail)
+        validateBookingTime(
+                dto.getBookingDate(),
+                dto.getStartTime(),
+                dto.getEndTime()
+        );
 
-    	// ❌ Today but past time
-    	if (dto.getBookingDate().isEqual(today)
-    	        && !dto.getStartTime().isAfter(now)) {
-
-    	    throw new ResponseStatusException(
-    	            HttpStatus.BAD_REQUEST,
-    	            "Cannot book a past time slot"
-    	    );
-    	}
-
-
-        // 1️⃣ User must exist
+        // 2️⃣ Load user
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "User not found"
+                ));
 
-        // 2️⃣ Amenity must exist
+        // 3️⃣ Load amenity
         Amenity amenity = amenityRepository.findById(dto.getAmenityId())
-                .orElseThrow(() -> new RuntimeException("Amenity not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Amenity not found"
+                ));
 
-        // 3️⃣ Amenity must belong to same society
+        // 4️⃣ Society ownership check
         if (!amenity.getSociety().getSocietyId().equals(societyId)) {
-            throw new RuntimeException("Amenity does not belong to this society");
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Amenity does not belong to this society"
+            );
         }
 
-        // 4️⃣ Amenity must be active
-        if (!amenity.isActive()) {
-            throw new RuntimeException("Amenity is not active");
+        // 5️⃣ Amenity must be ACTIVE
+        if (amenity.getStatus() != AmenityStatus.ACTIVE) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Amenity is inactive"
+            );
         }
 
-        // 5️⃣ Check time-slot conflicts
-        List<AmenityBooking> conflicts =
-                bookingRepository.findConflictingBookings(
-                        dto.getAmenityId(),
+        // 6️⃣ Overlap check (single source of truth)
+        boolean hasConflict =
+                !bookingRepository.findConflictingBookings(
+                        amenity.getAmenityId(),
                         dto.getBookingDate(),
                         dto.getStartTime(),
                         dto.getEndTime()
-                );
+                ).isEmpty();
 
-        if (!conflicts.isEmpty()) {
-            throw new RuntimeException("Time slot already booked");
+        if (hasConflict) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Amenity already booked for this time slot"
+            );
         }
 
-        // 6️⃣ Create booking
+        // 7️⃣ Create & save booking
         AmenityBooking booking = AmenityBooking.builder()
                 .amenity(amenity)
                 .society(amenity.getSociety())
@@ -104,27 +105,10 @@ public class AmenityBookingServiceImpl implements AmenityBookingService {
                 .status(BookingStatus.CREATED)
                 .createdAt(LocalDateTime.now())
                 .build();
-        
-        boolean conflict =
-                bookingRepository.existsByAmenity_AmenityIdAndBookingDateAndStatusAndStartTimeLessThanAndEndTimeGreaterThan(
-                        amenity.getAmenityId(),
-                        dto.getBookingDate(),
-                        BookingStatus.BOOKED,
-                        dto.getEndTime(),
-                        dto.getStartTime()
-                );
-
-        if (conflict) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Amenity already booked for this time slot"
-            );
-        }
-
 
         AmenityBooking saved = bookingRepository.save(booking);
 
-        // 7️⃣ Map to response
+        // 8️⃣ Map to response DTO
         return AmenityBookingResponseDto.builder()
                 .bookingId(saved.getBookingId())
                 .amenityName(amenity.getName())
@@ -134,17 +118,15 @@ public class AmenityBookingServiceImpl implements AmenityBookingService {
                 .status(saved.getStatus().name())
                 .build();
     }
+   
     //==================================================================
     @Override
     public List<AmenityBookingResponseDto> getMyBookings(
             Long societyId,
             String userEmail
     ) {
-        return bookingRepository
-                .findBySociety_SocietyIdAndBookedBy_EmailOrderByCreatedAtDesc(
-                        societyId,
-                        userEmail
-                )
+        return
+        		bookingRepository.findMyBookingsWithAmenity(societyId, userEmail)
                 .stream()
                 .map(booking -> AmenityBookingResponseDto.builder()
                         .bookingId(booking.getBookingId())
@@ -196,7 +178,10 @@ public class AmenityBookingServiceImpl implements AmenityBookingService {
 
         // 3️⃣ Only CREATED bookings can be cancelled
         if (booking.getStatus() != BookingStatus.CREATED) {
-            throw new RuntimeException("Booking already cancelled");
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Only CREATED bookings can be cancelled"
+            );
         }
 
         // 4️⃣ Soft cancel
@@ -205,45 +190,71 @@ public class AmenityBookingServiceImpl implements AmenityBookingService {
     }
     
     //=====================================================
-    @Override
-    @Transactional
-    public void cancelBooking(Long bookingId, Long userId) {
+    private void validateBookingTime(
+            LocalDate bookingDate,
+            LocalTime startTime,
+            LocalTime endTime
+    ) {
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
 
-        AmenityBooking booking = bookingRepository
-                .findByBookingIdAndBookedBy_UserId(bookingId, userId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Booking not found"
-                ));
-
-        if (booking.getStatus() == BookingStatus.CANCELLED) {
+        // 1️⃣ Past date not allowed
+        if (bookingDate.isBefore(today)) {
             throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Booking already cancelled"
+                    HttpStatus.BAD_REQUEST,
+                    "Cannot book for a past date"
             );
         }
 
-        booking.setStatus(BookingStatus.CANCELLED);
-        bookingRepository.save(booking);
+        // 2️⃣ Start time must be before end time
+        if (!startTime.isBefore(endTime)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Start time must be before end time"
+            );
+        }
+
+        // 3️⃣ Today: past time not allowed
+        if (bookingDate.isEqual(today) && !startTime.isAfter(now)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Cannot book a past time slot"
+            );
+        }
     }
+
     //============================================================
+    @Override
     @Transactional
     public void completeExpiredBookings() {
 
-        List<AmenityBooking> expired =
-        		bookingRepository.findByStatusAndEndTimeBefore(
-        		        BookingStatus.BOOKED,
-        		        LocalTime.now()       // ✅ MATCHES ENTITY
-        		);
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
 
+        // 1️⃣ Complete past-date bookings
+        List<AmenityBooking> pastBookings =
+                bookingRepository.findByStatusAndBookingDateBefore(
+                        BookingStatus.CREATED,
+                        today
+                );
 
-        for (AmenityBooking booking : expired) {
+        for (AmenityBooking booking : pastBookings) {
             booking.setStatus(BookingStatus.COMPLETED);
         }
 
-        bookingRepository.saveAll(expired);
+        // 2️⃣ Complete today's expired bookings
+        List<AmenityBooking> todayExpired =
+                bookingRepository.findByStatusAndBookingDateAndEndTimeBefore(
+                        BookingStatus.CREATED,
+                        today,
+                        now
+                );
+
+        for (AmenityBooking booking : todayExpired) {
+            booking.setStatus(BookingStatus.COMPLETED);
+        }
     }
-    
+
     //==============================================
 
 }

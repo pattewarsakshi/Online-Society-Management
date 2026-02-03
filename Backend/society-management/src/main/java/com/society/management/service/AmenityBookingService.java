@@ -26,7 +26,7 @@ public interface AmenityBookingService {
             String userEmail
     );
     
-    void cancelBooking(Long bookingId, Long userId);
+   
      
     void completeExpiredBookings();
 

@@ -12,9 +12,9 @@ import org.springframework.data.repository.query.Param;
 
 import com.society.management.entity.AmenityBooking;
 import com.society.management.enumtype.BookingStatus;
-public interface AmenityBookingRepository
-extends JpaRepository<AmenityBooking, Long> {
-
+public interface AmenityBookingRepository extends JpaRepository<AmenityBooking, Long> 
+{
+	//====================================================
 @Query("""
 SELECT b FROM AmenityBooking b
 WHERE b.amenity.amenityId = :amenityId
@@ -30,36 +30,38 @@ List<AmenityBooking> findConflictingBookings(
     @Param("start") LocalTime start,
     @Param("end") LocalTime end
 );
-
-List<AmenityBooking> findBySociety_SocietyIdAndBookedBy_EmailOrderByCreatedAtDesc(
-        Long societyId,
-        String email
-);
-
+//==========================================================
+@Query("""
+	    select ab from AmenityBooking ab
+	    join fetch ab.amenity
+	    where ab.society.societyId = :societyId
+	      and ab.bookedBy.email = :email
+	    order by ab.createdAt desc
+	""")
+	List<AmenityBooking> findMyBookingsWithAmenity(
+	        @Param("societyId") Long societyId,
+	        @Param("email") String email
+	);
+//==============================================================
 List<AmenityBooking> findBySociety_SocietyIdOrderByBookingDateDescStartTimeDesc(
         Long societyId
 );
+//===============================================================
 
 Optional<AmenityBooking> findByBookingIdAndSociety_SocietyId(
         Long bookingId,
         Long societyId
 );
-List<AmenityBooking> findByAmenity_AmenityIdAndBookingDateAndStatus(
-        Long amenityId,
-        LocalDate bookingDate,
-        BookingStatus status
-);
-Optional<AmenityBooking> findByBookingIdAndBookedBy_UserId(
-	    Long bookingId,
-	    Long userId
-	);
-boolean existsByAmenity_AmenityIdAndBookingDateAndStatusAndStartTimeLessThanAndEndTimeGreaterThan(
-        Long amenityId,
-        LocalDate bookingDate,
+//========================================================
+List<AmenityBooking> findByStatusAndBookingDateBefore(
         BookingStatus status,
-        LocalTime endTime,
-        LocalTime startTime
+        LocalDate date
 );
-List<AmenityBooking> findByStatusAndEndTimeBefore(BookingStatus booked, LocalTime now);
+//=========================================================
+List<AmenityBooking> findByStatusAndBookingDateAndEndTimeBefore(
+        BookingStatus status,
+        LocalDate bookingDate,
+        LocalTime endTime
+);
 
 }

@@ -11,10 +11,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BookingStatusScheduler {
 
-    private final AmenityBookingService bookingService;
+    private final AmenityBookingService amenityBookingService;
 
-    @Scheduled(fixedRate = 60000) // every 1 minute
+    @Scheduled(fixedRate = 60000)
     public void autoCompleteBookings() {
-        bookingService.completeExpiredBookings();
+        amenityBookingService.completeExpiredBookings();
     }
+
 }
