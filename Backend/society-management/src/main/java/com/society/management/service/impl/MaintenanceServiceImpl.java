@@ -22,6 +22,7 @@ import com.society.management.entity.Society;
 import com.society.management.entity.User;
 import com.society.management.enumtype.MaintenanceStatus;
 import com.society.management.enumtype.PropertyStatus;
+import com.society.management.enumtype.Role;
 import com.society.management.repository.MaintenanceRepository;
 import com.society.management.repository.PropertyRepository;
 import com.society.management.repository.SocietyRepository;
@@ -243,6 +244,44 @@ public class MaintenanceServiceImpl implements MaintenanceService {
                 .pendingAmount(pendingAmt)
                 .overdueAmount(overdueAmt)
                 .paidAmount(paidAmt)
+                .build();
+    }
+    
+    //=======================================================
+    @Override
+    public List<MaintenanceResponseDto> getMyMaintenance(String tenantEmail) {
+
+        User tenant = userRepository.findByEmail(tenantEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (tenant.getRole() != Role.TENANT) {
+            throw new RuntimeException("Access denied");
+        }
+
+        return maintenanceRepository
+                .findByProperty_Tenant_UserId(tenant.getUserId())
+                .stream()
+                .map(this::mapToResponseDto)
+                .toList();
+    }
+    
+    //===========================================================
+    //helper method
+    private MaintenanceResponseDto mapToResponseDto(Maintenance maintenance) {
+
+        Property property = maintenance.getProperty();
+
+        return MaintenanceResponseDto.builder()
+                .maintenanceId(maintenance.getMaintenanceId())
+                .propertyId(property.getPropertyId())
+                .flatNumber(property.getFlatNumber())
+                .block(property.getBlock())
+                .periodMonth(maintenance.getPeriodMonth())
+                .periodYear(maintenance.getPeriodYear())
+                .amount(maintenance.getAmount())
+                .status(maintenance.getStatus().name())
+                .dueDate(maintenance.getDueDate())
+                .paidAt(maintenance.getPaidAt())
                 .build();
     }
 

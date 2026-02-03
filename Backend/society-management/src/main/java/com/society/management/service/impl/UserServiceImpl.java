@@ -21,6 +21,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final SocietyRepository societyRepository;
     private final PasswordEncoder passwordEncoder;
+    
+    //================================================================
 
     public UserResponseDto createUser(UserRegisterRequestDto request) {
 
@@ -38,13 +40,13 @@ public class UserServiceImpl implements UserService {
 
         // Build User entity
         User user = User.builder()
-                .fullName(request.getFullName())
-                .email(request.getEmail())
-                .phone(request.getPhone())
-                .role(request.getRole())
-                .password(passwordEncoder.encode(request.getPassword())) // ALWAYS encode
-                .society(society)
-                .build();
+        	    .fullName(request.getFullName())
+        	    .email(request.getEmail())
+        	    .phone(request.getPhone())
+        	    .password(passwordEncoder.encode(request.getPassword()))
+        	    .society(society)
+        	    .build();
+
 
         User savedUser = userRepository.save(user);
 
@@ -78,15 +80,15 @@ public class UserServiceImpl implements UserService {
             society = societyRepository.findById(request.getSocietyId())
                     .orElseThrow(() -> new RuntimeException("Society not found"));
         }
-
         User user = User.builder()
-                .fullName(request.getFullName())
-                .email(request.getEmail())
-                .phone(request.getPhone())
-                .role(request.getRole())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .society(society)
-                .build();
+        	    .fullName(request.getFullName())
+        	    .email(request.getEmail())
+        	    .phone(request.getPhone())
+        	    .password(passwordEncoder.encode(request.getPassword()))
+        	    .society(society)
+        	    .build();
+
+       
 
         User savedUser = userRepository.save(user);
 

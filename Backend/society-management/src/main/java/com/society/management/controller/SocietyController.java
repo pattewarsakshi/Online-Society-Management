@@ -10,6 +10,7 @@ import com.society.management.dto.ApiResponseDto;
 import com.society.management.dto.OwnerRegisterRequestDto;
 import com.society.management.dto.SocietyRequestDto;
 import com.society.management.dto.SocietyResponseDto;
+import com.society.management.dto.UserRegisterRequestDto;
 import com.society.management.service.SocietyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -80,4 +81,18 @@ public class SocietyController {
                 societyService.getSocietyById(societyId)
         );
     }
+    
+    //===================================================
+    @PostMapping("/{societyId}/tenants")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> createTenant(
+            @PathVariable Long societyId,
+            @Valid @RequestBody UserRegisterRequestDto request
+    ) {
+        societyService.createTenant(societyId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+
+  
 }

@@ -7,6 +7,7 @@ import com.society.management.dto.AdminResponseDto;
 import com.society.management.dto.OwnerRegisterRequestDto;
 import com.society.management.dto.SocietyRequestDto;
 import com.society.management.dto.SocietyResponseDto;
+import com.society.management.dto.UserRegisterRequestDto;
 import com.society.management.entity.Property;
 import com.society.management.entity.Society;
 import com.society.management.entity.User;
@@ -205,6 +206,33 @@ public class SocietyServiceImpl implements SocietyService {
         dto.setState(society.getState());
 
         return dto;
+    }
+
+    //=================================================
+    @Override
+    public void createTenant(Long societyId, UserRegisterRequestDto request) {
+
+        Society society = societyRepository.findById(societyId)
+                .orElseThrow(() -> new RuntimeException("Society not found"));
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        if (userRepository.existsByPhone(request.getPhone())) {
+            throw new RuntimeException("Phone already exists");
+        }
+
+        User tenant = User.builder()
+                .fullName(request.getFullName())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.TENANT)
+                .society(society)
+                .build();
+
+        userRepository.save(tenant);
     }
 
 

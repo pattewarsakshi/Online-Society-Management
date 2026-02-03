@@ -16,6 +16,7 @@ import com.society.management.dto.MaintenanceSummaryDto;
 import com.society.management.security.CustomUserDetails;
 import com.society.management.service.MaintenanceService;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -80,5 +81,16 @@ public class MaintenanceController {
     ) {
         return maintenanceService.getMaintenanceSummary(societyId);
     }
+    //=========================================================
+    @PreAuthorize("hasRole('TENANT')")
+    @GetMapping("/my")
+    public ResponseEntity<List<MaintenanceResponseDto>> getMyMaintenance(
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                maintenanceService.getMyMaintenance(authentication.getName())
+        );
+    }
+
 
 }

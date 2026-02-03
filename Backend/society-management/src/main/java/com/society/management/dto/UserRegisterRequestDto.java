@@ -26,9 +26,6 @@ public class UserRegisterRequestDto {
     @NotBlank
     private String password;
 
-    @NotNull
-    private Role role;
-
     // Society ID comes from client
     private Long societyId;
 }

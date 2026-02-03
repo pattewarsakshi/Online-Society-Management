@@ -25,5 +25,8 @@ public interface MaintenanceService {
     void markAsPaid(Long societyId, Long maintenanceId);
     
     MaintenanceSummaryDto getMaintenanceSummary(Long societyId);
+    
+    List<MaintenanceResponseDto> getMyMaintenance(String tenantEmail);
+
 
 }

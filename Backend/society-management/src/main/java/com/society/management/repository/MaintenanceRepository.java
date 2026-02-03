@@ -46,6 +46,9 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> 
             @Param("societyId") Long societyId,
             @Param("status") MaintenanceStatus status
     );
+    
+    List<Maintenance> findByProperty_Tenant_UserId(Long tenantUserId);
+
 
 }
 
