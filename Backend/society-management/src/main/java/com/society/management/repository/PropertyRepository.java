@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.society.management.entity.Property;
 import com.society.management.enumtype.PropertyStatus;
@@ -34,6 +36,17 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 	        Long ownerUserId,
 	        PropertyStatus status
 	);
+	
+	@Query("""
+			 SELECT
+			   COUNT(p),
+			   SUM(CASE WHEN p.tenant IS NOT NULL THEN 1 ELSE 0 END),
+			   SUM(CASE WHEN p.tenant IS NULL THEN 1 ELSE 0 END)
+			 FROM Property p
+			 WHERE p.society.societyId = :societyId
+			""")
+			Object[] propertyOccupancy(@Param("societyId") Long societyId);
+
 
 
 

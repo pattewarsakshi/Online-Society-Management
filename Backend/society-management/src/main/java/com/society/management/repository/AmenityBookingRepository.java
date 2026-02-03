@@ -63,5 +63,16 @@ List<AmenityBooking> findByStatusAndBookingDateAndEndTimeBefore(
         LocalDate bookingDate,
         LocalTime endTime
 );
+//======================================================
+@Query("""
+		 SELECT
+		   SUM(CASE WHEN b.status='ACTIVE' THEN 1 ELSE 0 END),
+		   SUM(CASE WHEN b.status='COMPLETED' THEN 1 ELSE 0 END),
+		   SUM(CASE WHEN b.status='CANCELLED' THEN 1 ELSE 0 END)
+		 FROM AmenityBooking b
+		 WHERE b.society.societyId = :societyId
+		""")
+		Object[] bookingCounts(@Param("societyId") Long societyId);
+
 
 }

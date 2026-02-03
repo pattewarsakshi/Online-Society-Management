@@ -89,7 +89,18 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> 
     	    GROUP BY p.propertyId, p.flatNumber, p.block
     	""")
     List<Object[]> getOwnerPropertyWiseSummary(@Param("ownerId") Long ownerId);
- 
+//====================================================================
+    @Query("""
+    		 SELECT
+    		   COALESCE(SUM(m.amount),0),
+    		   COALESCE(SUM(CASE WHEN m.status='PAID' THEN m.amount ELSE 0 END),0),
+    		   COALESCE(SUM(CASE WHEN m.status='PENDING' THEN m.amount ELSE 0 END),0)
+    		 FROM Maintenance m
+    		 WHERE m.property.society.societyId = :societyId
+    		""")
+    		Object[] maintenanceTotals(@Param("societyId") Long societyId);
+//==================================================================
+    
 }
 
 	
