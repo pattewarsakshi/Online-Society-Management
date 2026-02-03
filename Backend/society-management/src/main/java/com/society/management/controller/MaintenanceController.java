@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.society.management.dto.CreateMaintenanceRequestDto;
 import com.society.management.dto.MaintenanceResponseDto;
 import com.society.management.dto.MaintenanceSummaryDto;
+import com.society.management.dto.OwnerDashboardResponseDto;
+import com.society.management.dto.TenantDashboardResponseDto;
 import com.society.management.security.CustomUserDetails;
 import com.society.management.service.MaintenanceService;
 
@@ -91,6 +93,25 @@ public class MaintenanceController {
                 maintenanceService.getMyMaintenance(authentication.getName())
         );
     }
+    
+    //===========================================================
+    @GetMapping("/tenant/dashboard")
+    @PreAuthorize("hasRole('TENANT')")
+    public ResponseEntity<TenantDashboardResponseDto> getTenantDashboard() {
+        return ResponseEntity.ok(
+                maintenanceService.getTenantDashboard()
+        );
+    }
+    
+    //============================================================
+    @GetMapping("/owner/dashboard")
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<OwnerDashboardResponseDto> getOwnerDashboard() {
+        return ResponseEntity.ok(
+                maintenanceService.getOwnerDashboard()
+        );
+    }
+
 
 
 }

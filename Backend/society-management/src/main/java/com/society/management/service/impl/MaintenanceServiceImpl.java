@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import com.society.management.dto.CreateMaintenanceRequestDto;
 import com.society.management.dto.MaintenanceResponseDto;
 import com.society.management.dto.MaintenanceSummaryDto;
+import com.society.management.dto.OwnerDashboardResponseDto;
+import com.society.management.dto.TenantDashboardResponseDto;
 import com.society.management.entity.Maintenance;
 import com.society.management.entity.Property;
 import com.society.management.entity.Society;
@@ -284,6 +286,84 @@ public class MaintenanceServiceImpl implements MaintenanceService {
                 .paidAt(maintenance.getPaidAt())
                 .build();
     }
+    
+    //=============================================================
+    @Override
+    public TenantDashboardResponseDto getTenantDashboard() {
+
+        String email = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        User tenant = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Object result = maintenanceRepository
+                .getTenantDashboardSummary(tenant.getUserId());
+
+        Object[] row;
+
+        // 🔑 handle nested Object[] safely
+        if (result instanceof Object[] && ((Object[]) result).length > 0
+                && ((Object[]) result)[0] instanceof Object[]) {
+            row = (Object[]) ((Object[]) result)[0];
+        } else {
+            row = (Object[]) result;
+        }
+
+        BigDecimal totalAmount = (BigDecimal) row[0];
+        BigDecimal paidAmount = (BigDecimal) row[1];
+        BigDecimal pendingAmount = (BigDecimal) row[2];
+        Long totalBills = ((Number) row[3]).longValue();
+
+        return TenantDashboardResponseDto.builder()
+                .totalAmount(totalAmount)
+                .paidAmount(paidAmount)
+                .pendingAmount(pendingAmount)
+                .totalBills(totalBills)
+                .build();
+    }
+    
+    //================================================================
+    @Override
+    public OwnerDashboardResponseDto getOwnerDashboard() {
+
+        String email = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        User owner = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (owner.getRole() != Role.OWNER) {
+            throw new RuntimeException("Access denied");
+        }
+
+        Object result = maintenanceRepository
+                .getOwnerDashboardSummary(owner.getUserId());
+
+        Object[] row;
+        if (result instanceof Object[] && ((Object[]) result).length > 0
+                && ((Object[]) result)[0] instanceof Object[]) {
+            row = (Object[]) ((Object[]) result)[0];
+        } else {
+            row = (Object[]) result;
+        }
+
+        BigDecimal totalAmount = (BigDecimal) row[0];
+        BigDecimal paidAmount = (BigDecimal) row[1];
+        BigDecimal pendingAmount = (BigDecimal) row[2];
+        Long totalBills = ((Number) row[3]).longValue();
+
+        return OwnerDashboardResponseDto.builder()
+                .totalAmount(totalAmount)
+                .paidAmount(paidAmount)
+                .pendingAmount(pendingAmount)
+                .totalBills(totalBills)
+                .build();
+    }
+
+
 
 }
 

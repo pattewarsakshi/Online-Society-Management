@@ -176,7 +176,7 @@ public class SocietyServiceImpl implements SocietyService {
 
         if (userRepository.existsByEmailOrPhone(
                 request.getEmail(), request.getPhone())) {
-        	throw new OwnerAlreadyExistsException("Owner already exists");
+        	throw new OwnerAlreadyExistsException("User already exists with this phone or email");
   
         }
 

@@ -5,6 +5,7 @@ import com.society.management.dto.UserRegisterRequestDto;
 import com.society.management.dto.UserResponseDto;
 import com.society.management.entity.Society;
 import com.society.management.entity.User;
+import com.society.management.enumtype.Role;
 import com.society.management.repository.SocietyRepository;
 import com.society.management.repository.UserRepository;
 import com.society.management.service.UserService;
@@ -24,98 +25,34 @@ public class UserServiceImpl implements UserService {
     
     //================================================================
 
-    public UserResponseDto createUser(UserRegisterRequestDto request) {
-
-        // Check duplicate email
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
-        }
-
-        // Fetch society if provided
-        Society society = null;
-        if (request.getSocietyId() != null) {
-            society = societyRepository.findById(request.getSocietyId())
-                    .orElseThrow(() -> new RuntimeException("Society not found"));
-        }
-
-        // Build User entity
-        User user = User.builder()
-        	    .fullName(request.getFullName())
-        	    .email(request.getEmail())
-        	    .phone(request.getPhone())
-        	    .password(passwordEncoder.encode(request.getPassword()))
-        	    .society(society)
-        	    .build();
-
-
-        User savedUser = userRepository.save(user);
-
-        // Convert to response DTO
-        return UserResponseDto.builder()
-                .userId(savedUser.getUserId())
-                .fullName(savedUser.getFullName())
-                .email(savedUser.getEmail())
-                .phone(savedUser.getPhone())
-                .role(savedUser.getRole())
-                .societyId(
-                        savedUser.getSociety() != null
-                                ? savedUser.getSociety().getSocietyId()
-                                : null
-                )
-                .build();
-    }
-
-
-
     @Override
     @Transactional
-    public UserResponseDto registerUser(UserRegisterRequestDto request) {
+    public User createUserInternal(
+            UserRegisterRequestDto request,
+            Role role,
+            Society society
+    ) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
 
-        Society society = null;
-        if (request.getSocietyId() != null) {
-            society = societyRepository.findById(request.getSocietyId())
-                    .orElseThrow(() -> new RuntimeException("Society not found"));
+        if (userRepository.existsByPhone(request.getPhone())) {
+            throw new RuntimeException("Phone already exists");
         }
+
         User user = User.builder()
-        	    .fullName(request.getFullName())
-        	    .email(request.getEmail())
-        	    .phone(request.getPhone())
-        	    .password(passwordEncoder.encode(request.getPassword()))
-        	    .society(society)
-        	    .build();
-
-       
-
-        User savedUser = userRepository.save(user);
-
-        return UserResponseDto.builder()
-                .userId(savedUser.getUserId())
-                .fullName(savedUser.getFullName())
-                .email(savedUser.getEmail())
-                .phone(savedUser.getPhone())
-                .role(savedUser.getRole())
-                .societyId(
-                        savedUser.getSociety() != null
-                                ? savedUser.getSociety().getSocietyId()
-                                : null
-                )
+                .fullName(request.getFullName())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(role)              // ✅ role set HERE
+                .society(society)
                 .build();
+
+        return userRepository.save(user);
     }
 
-    @Override
-    @Transactional
-    public void resetPassword(Long userId, String newPassword) {
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
-    }
     //============================================================
     //for dashbboard purpose
     @Override
@@ -148,6 +85,19 @@ public class UserServiceImpl implements UserService {
                 )
                 .build();
     }
+    //================================================================
+    @Override
+    @Transactional
+    public void resetPassword(Long userId, String newPassword) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+    }
+    
+    //=============================================================
+
 
 	}
 

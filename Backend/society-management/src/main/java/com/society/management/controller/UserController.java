@@ -25,14 +25,7 @@ public class UserController {
     /**
      * Register a new user (ADMIN / SUPER_ADMIN only)
      */
-    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
-    @PostMapping("/register")
-    public ResponseEntity<UserResponseDto> registerUser(
-            @Valid @RequestBody UserRegisterRequestDto requestDto) {
-
-        UserResponseDto response = userService.registerUser(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
+    
     
     @PutMapping("/{userId}/reset-password")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")

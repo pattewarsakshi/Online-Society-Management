@@ -48,7 +48,31 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> 
     );
     
     List<Maintenance> findByProperty_Tenant_UserId(Long tenantUserId);
-
+//=================================================================
+    
+    @Query("""
+    	    SELECT
+    	        COALESCE(SUM(m.amount), 0),
+    	        COALESCE(SUM(CASE WHEN m.status = 'PAID' THEN m.amount ELSE 0 END), 0),
+    	        COALESCE(SUM(CASE WHEN m.status = 'PENDING' THEN m.amount ELSE 0 END), 0),
+    	        COUNT(m)
+    	    FROM Maintenance m
+    	    JOIN m.property p
+    	    WHERE p.tenant.userId = :tenantId
+    	""")
+    	Object[] getTenantDashboardSummary(@Param("tenantId") Long tenantId);
+//=========================================================
+    @Query("""
+    	    SELECT
+    	        COALESCE(SUM(m.amount), 0),
+    	        COALESCE(SUM(CASE WHEN m.status = 'PAID' THEN m.amount ELSE 0 END), 0),
+    	        COALESCE(SUM(CASE WHEN m.status = 'PENDING' THEN m.amount ELSE 0 END), 0),
+    	        COUNT(m)
+    	    FROM Maintenance m
+    	    JOIN m.property p
+    	    WHERE p.owner.userId = :ownerId
+    	""")
+    	Object[] getOwnerDashboardSummary(@Param("ownerId") Long ownerId);
 
 }
 

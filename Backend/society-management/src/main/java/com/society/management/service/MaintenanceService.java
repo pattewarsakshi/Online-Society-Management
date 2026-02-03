@@ -5,6 +5,8 @@ import java.util.List;
 import com.society.management.dto.CreateMaintenanceRequestDto;
 import com.society.management.dto.MaintenanceResponseDto;
 import com.society.management.dto.MaintenanceSummaryDto;
+import com.society.management.dto.OwnerDashboardResponseDto;
+import com.society.management.dto.TenantDashboardResponseDto;
 
 public interface MaintenanceService {
 
@@ -27,6 +29,12 @@ public interface MaintenanceService {
     MaintenanceSummaryDto getMaintenanceSummary(Long societyId);
     
     List<MaintenanceResponseDto> getMyMaintenance(String tenantEmail);
+    
+    TenantDashboardResponseDto getTenantDashboard();
+    
+    OwnerDashboardResponseDto getOwnerDashboard();
+
+
 
 
 }
