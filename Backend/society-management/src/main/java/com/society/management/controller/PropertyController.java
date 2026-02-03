@@ -1,6 +1,7 @@
 package com.society.management.controller;
 
 import com.society.management.dto.OwnerChangeRequestDto;
+import com.society.management.dto.PropertyCardDto;
 import com.society.management.dto.PropertyCreateRequestDto;
 import com.society.management.dto.PropertyResponseDto;
 import com.society.management.dto.PropertyUpdateRequestDto;
@@ -127,6 +128,17 @@ public class PropertyController {
                 propertyService.getPropertiesForOwner(email)
         );
     }
+    
+    @GetMapping("/cards")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
+    public ResponseEntity<List<PropertyCardDto>> getPropertyCards(
+            @PathVariable Long societyId) {
+
+        return ResponseEntity.ok(
+                propertyService.getPropertyCards(societyId)
+        );
+    }
+
 
 
 

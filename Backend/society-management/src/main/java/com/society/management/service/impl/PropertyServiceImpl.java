@@ -1,6 +1,7 @@
 package com.society.management.service.impl;
 
 
+import com.society.management.dto.PropertyCardDto;
 import com.society.management.dto.PropertyCreateRequestDto;
 import com.society.management.dto.PropertyResponseDto;
 import com.society.management.dto.PropertyUpdateRequestDto;
@@ -265,9 +266,37 @@ public class PropertyServiceImpl implements PropertyService {
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
+//=======================================================
+    @Override
+    public List<PropertyCardDto> getPropertyCards(Long societyId) {
+
+        List<Object[]> rows = propertyRepository.getPropertyCards(societyId);
+
+        return rows.stream().map(row -> {
+
+            Long propertyId = ((Number) row[0]).longValue();
+            String flatNumber = (String) row[1];
+            String block = (String) row[2];
+            String ownerName = (String) row[3];
+            String tenantName = (String) row[4]; // ✅ FIXED HERE
+
+            String status = (tenantName == null) ? "VACANT" : "OCCUPIED";
+
+            return PropertyCardDto.builder()
+                    .propertyId(propertyId)
+                    .flatNumber(flatNumber)
+                    .block(block)
+                    .ownerName(ownerName)
+                    .tenantName(tenantName != null ? tenantName : "—")
+                    .status(status)
+                    .build();
+        }).toList();
+    }
 
 
-
-
-
+    
 }
+
+
+
+

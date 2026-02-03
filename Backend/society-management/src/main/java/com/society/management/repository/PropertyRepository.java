@@ -46,6 +46,20 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 			 WHERE p.society.societyId = :societyId
 			""")
 			Object[] propertyOccupancy(@Param("societyId") Long societyId);
+//=====================================================
+	@Query("""
+		    SELECT
+		        p.propertyId,
+		        p.flatNumber,
+		        p.block,
+		        o.fullName,
+		        t.fullName
+		    FROM Property p
+		    JOIN p.owner o
+		    LEFT JOIN p.tenant t
+		    WHERE p.society.societyId = :societyId
+		""")
+		List<Object[]> getPropertyCards(@Param("societyId") Long societyId);
 
 
 

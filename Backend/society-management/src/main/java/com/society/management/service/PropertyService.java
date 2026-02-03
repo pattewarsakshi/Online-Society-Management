@@ -2,6 +2,7 @@ package com.society.management.service;
 
 import java.util.List;
 
+import com.society.management.dto.PropertyCardDto;
 import com.society.management.dto.PropertyCreateRequestDto;
 import com.society.management.dto.PropertyResponseDto;
 import com.society.management.dto.PropertyUpdateRequestDto;
@@ -34,5 +35,6 @@ public interface PropertyService {
     
     List<PropertyResponseDto> getPropertiesForOwner(String ownerEmail);
 
+    List<PropertyCardDto> getPropertyCards(Long societyId);
 
 }
