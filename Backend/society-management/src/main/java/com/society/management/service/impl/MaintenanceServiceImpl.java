@@ -17,6 +17,7 @@ import com.society.management.dto.CreateMaintenanceRequestDto;
 import com.society.management.dto.MaintenanceResponseDto;
 import com.society.management.dto.MaintenanceSummaryDto;
 import com.society.management.dto.OwnerDashboardResponseDto;
+import com.society.management.dto.OwnerPropertyMaintenanceDto;
 import com.society.management.dto.TenantDashboardResponseDto;
 import com.society.management.entity.Maintenance;
 import com.society.management.entity.Property;
@@ -362,6 +363,47 @@ public class MaintenanceServiceImpl implements MaintenanceService {
                 .totalBills(totalBills)
                 .build();
     }
+    
+    //=====================================================
+    @Override
+    public List<OwnerPropertyMaintenanceDto> getOwnerPropertyDashboard() {
+
+        String email = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        User owner = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (owner.getRole() != Role.OWNER) {
+            throw new RuntimeException("Access denied");
+        }
+
+        List<Object[]> rows =
+                maintenanceRepository.getOwnerPropertyWiseSummary(owner.getUserId());
+
+        return rows.stream().map(row -> {
+
+            Long propertyId = ((Number) row[0]).longValue();
+            String flatNumber = (String) row[1];
+            String block = (String) row[2];
+            BigDecimal totalAmount = (BigDecimal) row[3];
+            BigDecimal paidAmount = (BigDecimal) row[4];
+            BigDecimal pendingAmount = (BigDecimal) row[5];
+            Long totalBills = ((Number) row[6]).longValue();
+
+            return OwnerPropertyMaintenanceDto.builder()
+                    .propertyId(propertyId)
+                    .flatNumber(flatNumber)
+                    .block(block)
+                    .totalAmount(totalAmount)
+                    .paidAmount(paidAmount)
+                    .pendingAmount(pendingAmount)
+                    .totalBills(totalBills)
+                    .build();
+        }).toList();
+    }
+
 
 
 
