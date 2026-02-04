@@ -1,5 +1,6 @@
 package com.society.management.service.impl;
 
+import com.society.management.dto.AdminUserTableDto;
 import com.society.management.dto.MeResponseDto;
 import com.society.management.dto.UserRegisterRequestDto;
 import com.society.management.dto.UserResponseDto;
@@ -12,6 +13,9 @@ import com.society.management.service.UserService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -97,6 +101,31 @@ public class UserServiceImpl implements UserService {
     }
     
     //=============================================================
+    @Override
+    public List<AdminUserTableDto> getAdminUsers(Long societyId, Role role) {
+
+        List<Object[]> rows =
+                userRepository.getUsersForAdminTable(societyId, role);
+
+        return rows.stream().map(row -> {
+
+            Long userId = ((Number) row[0]).longValue();
+            String fullName = (String) row[1];
+            String email = (String) row[2];
+            String phone = (String) row[3];
+            String userRole = row[4].toString();
+            String societyName = (String) row[5];
+
+            return AdminUserTableDto.builder()
+                    .userId(userId)
+                    .fullName(fullName)
+                    .email(email)
+                    .phone(phone)
+                    .role(userRole)
+                    .societyName(societyName)
+                    .build();
+        }).toList();
+    }
 
 
 	}

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -35,6 +36,23 @@ public interface UserRepository extends JpaRepository<User, Long> {
     		""")
     		Object[] countUsersByRole(@Param("societyId") Long societyId);
  //============================================================
-    
+    @Query("""
+    	    SELECT
+    	        u.userId,
+    	        u.fullName,
+    	        u.email,
+    	        u.phone,
+    	        u.role,
+    	        s.societyName
+    	    FROM User u
+    	    LEFT JOIN u.society s
+    	    WHERE s.societyId = :societyId
+    	      AND (:role IS NULL OR u.role = :role)
+    	""")
+    	List<Object[]> getUsersForAdminTable(
+    	        @Param("societyId") Long societyId,
+    	        @Param("role") Role role
+    	);
+
 
 }

@@ -1,6 +1,9 @@
 package com.society.management.service;
 
 
+import java.util.List;
+
+import com.society.management.dto.AdminUserTableDto;
 import com.society.management.dto.MeResponseDto;
 import com.society.management.dto.UserRegisterRequestDto;
 import com.society.management.entity.Society;
@@ -21,6 +24,9 @@ public interface UserService {
 
     // Logged-in user profile
     MeResponseDto getCurrentUser();
+    
+    List<AdminUserTableDto> getAdminUsers(Long societyId, Role role);
+
 }
 
 

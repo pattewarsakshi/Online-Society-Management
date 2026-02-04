@@ -1,12 +1,17 @@
 package com.society.management.controller;
 
+import com.society.management.dto.AdminUserTableDto;
 import com.society.management.dto.MeResponseDto;
 import com.society.management.dto.ResetPasswordRequestDto;
 import com.society.management.dto.UserRegisterRequestDto;
 import com.society.management.dto.UserResponseDto;
+import com.society.management.enumtype.Role;
 import com.society.management.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,9 +41,12 @@ public class UserController {
         userService.resetPassword(userId, request.getNewPassword());
         return ResponseEntity.ok("Password reset successfully");
     }
-    
+    //=========================================================
     @GetMapping("/me")
     public ResponseEntity<MeResponseDto> me() {
         return ResponseEntity.ok(userService.getCurrentUser());
     }
+    //========================================================
+    
+   
 }
