@@ -1,5 +1,6 @@
 package com.society.management.controller;
 
+import com.society.management.dto.GuardDashboardResponseDto;
 import com.society.management.dto.VisitorEntryRequestDto;
 import com.society.management.dto.VisitorEntryResponseDto;
 import com.society.management.service.VisitorEntryService;
@@ -41,4 +42,15 @@ public class VisitorEntryController {
         visitorEntryService.markExit(visitorEntryId);
         return ResponseEntity.ok("Visitor exit marked");
     }
+    
+    @GetMapping("/dashboard")
+    @PreAuthorize("hasRole('GUARD')")
+    public ResponseEntity<GuardDashboardResponseDto> getDashboard(
+            @PathVariable Long societyId
+    ) {
+        return ResponseEntity.ok(
+                visitorEntryService.getGuardDashboard(societyId)
+        );
+    }
+
 }

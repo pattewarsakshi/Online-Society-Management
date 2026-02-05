@@ -1,5 +1,6 @@
 package com.society.management.service;
 
+import com.society.management.dto.GuardDashboardResponseDto;
 import com.society.management.dto.VisitorEntryRequestDto;
 import com.society.management.dto.VisitorEntryResponseDto;
 
@@ -12,4 +13,7 @@ public interface VisitorEntryService {
     );
 
     void markExit(Long visitorEntryId);
+    
+    GuardDashboardResponseDto getGuardDashboard(Long societyId);
+
 }

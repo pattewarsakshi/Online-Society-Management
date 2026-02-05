@@ -1,5 +1,6 @@
 package com.society.management.service.impl;
 
+import com.society.management.dto.GuardDashboardResponseDto;
 import com.society.management.dto.VisitorEntryRequestDto;
 import com.society.management.dto.VisitorEntryResponseDto;
 import com.society.management.entity.*;
@@ -8,6 +9,7 @@ import com.society.management.service.VisitorEntryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -66,4 +68,25 @@ public class VisitorEntryServiceImpl implements VisitorEntryService {
         entry.setExitTime(LocalDateTime.now());
         visitorEntryRepository.save(entry);
     }
+    
+    @Override
+    public GuardDashboardResponseDto getGuardDashboard(Long societyId) {
+
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59);
+
+        long totalToday = visitorEntryRepository
+                .countBySociety_SocietyIdAndEntryTimeBetween(
+                        societyId, startOfDay, endOfDay
+                );
+
+        long inside = visitorEntryRepository
+                .countBySociety_SocietyIdAndExitTimeIsNull(societyId);
+
+        return GuardDashboardResponseDto.builder()
+                .totalVisitorsToday(totalToday)
+                .visitorsInside(inside)
+                .build();
+    }
+
 }

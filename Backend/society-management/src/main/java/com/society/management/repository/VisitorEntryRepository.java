@@ -13,4 +13,13 @@ public interface VisitorEntryRepository extends JpaRepository<VisitorEntry, Long
             LocalDateTime start,
             LocalDateTime end
     );
+    
+    long countBySociety_SocietyIdAndEntryTimeBetween(
+            Long societyId,
+            java.time.LocalDateTime start,
+            java.time.LocalDateTime end
+    );
+
+    long countBySociety_SocietyIdAndExitTimeIsNull(Long societyId);
+
 }
