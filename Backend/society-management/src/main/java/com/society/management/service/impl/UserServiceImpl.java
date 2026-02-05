@@ -1,6 +1,7 @@
 package com.society.management.service.impl;
 
 import com.society.management.dto.AdminUserTableDto;
+import com.society.management.dto.GuardRegisterRequestDto;
 import com.society.management.dto.MeResponseDto;
 import com.society.management.dto.UserRegisterRequestDto;
 import com.society.management.dto.UserResponseDto;
@@ -125,6 +126,30 @@ public class UserServiceImpl implements UserService {
                     .societyName(societyName)
                     .build();
         }).toList();
+    }
+//=================================================
+    @Override
+    @Transactional
+    public void createGuard(Long societyId, GuardRegisterRequestDto request) {
+
+        Society society = societyRepository.findById(societyId)
+                .orElseThrow(() -> new RuntimeException("Society not found"));
+
+        if (userRepository.existsByEmailOrPhone(
+                request.getEmail(), request.getPhone())) {
+            throw new RuntimeException("Guard already exists");
+        }
+
+        User guard = User.builder()
+                .fullName(request.getFullName())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.GUARD)
+                .society(society)
+                .build();
+
+        userRepository.save(guard);
     }
 
 
