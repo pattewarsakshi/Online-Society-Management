@@ -41,6 +41,7 @@ public interface MaintenanceService {
     
     List<TenantMaintenanceUiDto> getTenantMaintenanceUi();
 
+    void payMaintenanceAsTenant(Long maintenanceId, String tenantEmail);
 
 
 

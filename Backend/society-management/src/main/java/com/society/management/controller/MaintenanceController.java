@@ -15,10 +15,13 @@ import com.society.management.dto.MaintenanceResponseDto;
 import com.society.management.dto.MaintenanceSummaryDto;
 import com.society.management.dto.OwnerDashboardResponseDto;
 import com.society.management.dto.OwnerPropertyMaintenanceDto;
+import com.society.management.dto.PayMaintenanceRequestDto;
 import com.society.management.dto.TenantDashboardResponseDto;
 import com.society.management.dto.TenantMaintenanceUiDto;
 import com.society.management.security.CustomUserDetails;
 import com.society.management.service.MaintenanceService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -136,6 +139,20 @@ public class MaintenanceController {
         );
     }
 
+//================================================
+    @PostMapping("/maintenance/pay")
+    @PreAuthorize("hasRole('TENANT')")
+    public ResponseEntity<String> payMaintenance(
+            @RequestBody @Valid PayMaintenanceRequestDto dto,
+            Authentication authentication
+    ) {
+        maintenanceService.payMaintenanceAsTenant(
+                dto.getMaintenanceId(),
+                authentication.getName()
+        );
+
+        return ResponseEntity.ok("Payment successful");
+    }
 
 
 

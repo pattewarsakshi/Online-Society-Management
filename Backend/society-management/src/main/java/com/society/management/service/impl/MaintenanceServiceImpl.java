@@ -449,6 +449,28 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         }).toList();
     }
 
+//=====================================================
+    @Override
+    @Transactional
+    public void payMaintenanceAsTenant(Long maintenanceId, String tenantEmail) {
+
+        Maintenance m = maintenanceRepository.findById(maintenanceId)
+                .orElseThrow(() -> new RuntimeException("Maintenance not found"));
+
+        if (m.getStatus() == MaintenanceStatus.PAID) {
+            throw new RuntimeException("Maintenance already paid");
+        }
+
+        // Ensure logged-in tenant owns this maintenance
+        if (!m.getProperty().getTenant().getEmail().equals(tenantEmail)) {
+            throw new RuntimeException("Unauthorized payment attempt");
+        }
+
+        m.setStatus(MaintenanceStatus.PAID);
+        m.setPaidAt(LocalDateTime.now());
+
+        maintenanceRepository.save(m);
+    }
 
 
 }
