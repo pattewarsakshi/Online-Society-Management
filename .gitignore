@@ -30,4 +30,20 @@ dist/
 target/
 
 # Logs
+
+# IDE / OS
+.metadata/
+**/.metadata/
+.vscode/
+.idea/
+.DS_Store
+
+# Maven / Java
+target/
+*.log
+
+# Node
+node_modules/
+dist/
+
 *.log
