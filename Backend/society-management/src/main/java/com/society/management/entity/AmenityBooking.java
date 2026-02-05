@@ -6,6 +6,7 @@ import java.time.LocalTime;
 
 import com.society.management.enumtype.BookingStatus;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -50,8 +51,10 @@ public class AmenityBooking {
     private LocalDate bookingDate;
     private LocalTime startTime;
     private LocalTime endTime;
-
+    
+    
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private BookingStatus status;
 
     private LocalDateTime createdAt;

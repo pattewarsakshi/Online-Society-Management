@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.society.management.dto.AmenityBookingResponseDto;
 import com.society.management.dto.CreateAmenityBookingDto;
+import com.society.management.dto.MyAmenityBookingDto;
 
 public interface AmenityBookingService {
 
@@ -29,6 +30,8 @@ public interface AmenityBookingService {
    
      
     void completeExpiredBookings();
+
+    List<MyAmenityBookingDto> getMyBookings();
 
 
 }

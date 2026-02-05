@@ -73,6 +73,21 @@ List<AmenityBooking> findByStatusAndBookingDateAndEndTimeBefore(
 		 WHERE b.society.societyId = :societyId
 		""")
 		Object[] bookingCounts(@Param("societyId") Long societyId);
+//=======================================================
+@Query("""
+	    SELECT
+	        b.bookingId,
+	        a.name,
+	        b.bookingDate,
+	        b.startTime,
+	        b.endTime,
+	        b.status
+	    FROM AmenityBooking b
+	    JOIN b.amenity a
+	    WHERE b.bookedBy.email = :email
+	    ORDER BY b.bookingDate DESC, b.startTime DESC
+	""")
+	List<Object[]> findMyBookings(@Param("email") String email);
 
 
 }

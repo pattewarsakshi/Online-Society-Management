@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.society.management.dto.AmenityBookingResponseDto;
 import com.society.management.dto.CreateAmenityBookingDto;
+import com.society.management.dto.MyAmenityBookingDto;
 import com.society.management.entity.Amenity;
 import com.society.management.entity.AmenityBooking;
 import com.society.management.entity.User;
@@ -21,7 +22,7 @@ import com.society.management.repository.UserRepository;
 import com.society.management.service.AmenityBookingService;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
-
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import lombok.RequiredArgsConstructor;
 
@@ -256,5 +257,27 @@ public class AmenityBookingServiceImpl implements AmenityBookingService {
     }
 
     //==============================================
+    @Override
+    public List<MyAmenityBookingDto> getMyBookings() {
+
+        String email = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        List<Object[]> rows =
+                bookingRepository.findMyBookings(email);
+
+        return rows.stream().map(row -> {
+
+            return MyAmenityBookingDto.builder()
+                    .bookingId(((Number) row[0]).longValue())
+                    .amenityName((String) row[1])
+                    .bookingDate((LocalDate) row[2])
+                    .startTime((LocalTime) row[3])
+                    .endTime((LocalTime) row[4])
+                    .status(row[5].toString())
+                    .build();
+        }).toList();
+    }
 
 }
