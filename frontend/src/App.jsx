@@ -12,10 +12,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public */}
         <Route path="/" element={<Login />} />
 
-        {/* SUPER ADMIN */}
         <Route
           path="/super-admin"
           element={
@@ -25,7 +23,6 @@ function App() {
           }
         />
 
-        {/* ADMIN */}
         <Route
           path="/admin"
           element={
@@ -35,7 +32,6 @@ function App() {
           }
         />
 
-        {/* GUARD */}
         <Route
           path="/guard"
           element={
@@ -45,7 +41,6 @@ function App() {
           }
         />
 
-        {/* TENANT */}
         <Route
           path="/tenant"
           element={
