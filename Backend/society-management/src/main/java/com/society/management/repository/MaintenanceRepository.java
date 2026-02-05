@@ -100,7 +100,15 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> 
     		""")
     		Object[] maintenanceTotals(@Param("societyId") Long societyId);
 //==================================================================
-    
+    @Query("""
+    	    SELECT m
+    	    FROM Maintenance m
+    	    JOIN m.property p
+    	    WHERE p.tenant.email = :email
+    	    ORDER BY m.dueDate DESC
+    	""")
+    	List<Maintenance> findTenantMaintenance(@Param("email") String email);
+
 }
 
 	

@@ -8,6 +8,7 @@ import com.society.management.dto.MaintenanceSummaryDto;
 import com.society.management.dto.OwnerDashboardResponseDto;
 import com.society.management.dto.OwnerPropertyMaintenanceDto;
 import com.society.management.dto.TenantDashboardResponseDto;
+import com.society.management.dto.TenantMaintenanceUiDto;
 
 public interface MaintenanceService {
 
@@ -36,6 +37,9 @@ public interface MaintenanceService {
     OwnerDashboardResponseDto getOwnerDashboard();
 
     List<OwnerPropertyMaintenanceDto> getOwnerPropertyDashboard();
+    
+    
+    List<TenantMaintenanceUiDto> getTenantMaintenanceUi();
 
 
 

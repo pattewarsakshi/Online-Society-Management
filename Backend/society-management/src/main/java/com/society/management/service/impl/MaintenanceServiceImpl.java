@@ -1,6 +1,7 @@
 package com.society.management.service.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import com.society.management.dto.MaintenanceSummaryDto;
 import com.society.management.dto.OwnerDashboardResponseDto;
 import com.society.management.dto.OwnerPropertyMaintenanceDto;
 import com.society.management.dto.TenantDashboardResponseDto;
+import com.society.management.dto.TenantMaintenanceUiDto;
 import com.society.management.entity.Maintenance;
 import com.society.management.entity.Property;
 import com.society.management.entity.Society;
@@ -404,6 +406,48 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         }).toList();
     }
 
+//=====================================================
+    @Override
+    public List<TenantMaintenanceUiDto> getTenantMaintenanceUi() {
+
+        String email = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        List<Maintenance> list =
+                maintenanceRepository.findTenantMaintenance(email);
+
+        LocalDate today = LocalDate.now();
+
+        return list.stream().map(m -> {
+
+            String urgency = "OK";
+
+            if (m.getStatus() == MaintenanceStatus.PENDING) {
+
+                if (m.getDueDate().isBefore(today)) {
+                    urgency = "OVERDUE";
+                } else if (!m.getDueDate().isAfter(today.plusDays(7))) {
+                    urgency = "DUE_SOON";
+                }
+            }
+
+            return TenantMaintenanceUiDto.builder()
+                    .maintenanceId(m.getMaintenanceId())
+                    .month(m.getPeriodMonth())
+                    .year(m.getPeriodYear())
+                    .amount(m.getAmount())
+                    .status(m.getStatus().name()) // enum → String for UI
+                    .dueDate(m.getDueDate())
+                    .paidDate(
+                            m.getPaidAt() != null
+                                    ? m.getPaidAt().toLocalDate()
+                                    : null
+                    )
+                    .urgency(urgency)
+                    .build();
+        }).toList();
+    }
 
 
 

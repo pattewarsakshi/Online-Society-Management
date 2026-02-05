@@ -16,6 +16,7 @@ import com.society.management.dto.MaintenanceSummaryDto;
 import com.society.management.dto.OwnerDashboardResponseDto;
 import com.society.management.dto.OwnerPropertyMaintenanceDto;
 import com.society.management.dto.TenantDashboardResponseDto;
+import com.society.management.dto.TenantMaintenanceUiDto;
 import com.society.management.security.CustomUserDetails;
 import com.society.management.service.MaintenanceService;
 
@@ -123,6 +124,18 @@ public class MaintenanceController {
                 maintenanceService.getOwnerPropertyDashboard()
         );
     }
+    
+    //=============================================
+    @GetMapping("/tenant/maintenance")
+    @PreAuthorize("hasRole('TENANT')")
+    public ResponseEntity<List<TenantMaintenanceUiDto>>
+    getTenantMaintenanceUi() {
+
+        return ResponseEntity.ok(
+                maintenanceService.getTenantMaintenanceUi()
+        );
+    }
+
 
 
 
