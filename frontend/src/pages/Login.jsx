@@ -1,11 +1,16 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import { useAuth } from "../auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-export default function Login() {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { setUser } = useAuth();
+
+
   const navigate = useNavigate();
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -16,38 +21,28 @@ export default function Login() {
         password,
       });
 
-      console.log("LOGIN RESPONSE 👉", res.data);
+      const { token, role, societyId } = res.data;
 
-      const { token, role } = res.data;
-
+      // store token
       localStorage.setItem("token", token);
-      localStorage.setItem("role", role);
 
-      // ✅ React Router navigation
-      if (role === "SUPER_ADMIN") navigate("/super-admin");
-      else if (role === "ADMIN") navigate("/admin");
-      else if (role === "GUARD") navigate("/guard");
-      else if (role === "TENANT") navigate("/tenant");
-      else navigate("/");
+      // store user in context
+      setUser({ role, societyId });
 
-    } catch (err) {
-      console.error("LOGIN ERROR 👉", err?.response?.data || err.message);
-      alert("Login failed");
+      if (role === "SUPER_ADMIN") 
+    {
+     navigate("/super-admin/societies");
     }
 
-    console.log("ROLE FROM BACKEND 👉", role);
 
-const cleanRole = role.toUpperCase(); // 🔥 IMPORTANT
-
-console.log("CLEAN ROLE 👉", cleanRole);
-console.log("ABOUT TO NAVIGATE 👉 /guard");
-
-navigate("/guard");
-
+      alert("User stored in AuthContext");
+    } catch (err) {
+      console.error("LOGIN ERROR 👉", err);
+    }
   };
 
   return (
-    <div style={{ padding: "40px" }}>
+    <div style={{ padding: 40 }}>
       <h2>Login</h2>
 
       <form onSubmit={handleLogin}>
@@ -55,25 +50,22 @@ navigate("/guard");
           type="email"
           placeholder="Email"
           value={email}
-          required
           onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <br /><br />
+          required
+        /><br /><br />
 
         <input
           type="password"
           placeholder="Password"
           value={password}
-          required
-          autoComplete="current-password"
           onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <br /><br />
+          required
+        /><br /><br />
 
         <button type="submit">Login</button>
       </form>
     </div>
   );
-}
+};
+
+export default Login;

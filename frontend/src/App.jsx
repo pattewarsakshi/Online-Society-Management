@@ -1,56 +1,49 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
-import SuperAdminDashboard from "./pages/SuperAdminDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
-import GuardDashboard from "./pages/GuardDashboard";
-import TenantDashboard from "./pages/TenantDashboard";
-
+import SocietiesList from "./pages/super-admin/SocietiesList";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CreateSociety from "./pages/super-admin/CreateSociety";
+import CreateAdmin from "./pages/super-admin/CreateAdmin";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
+    <Routes>
+      {/* PUBLIC */}
+      <Route path="/login" element={<Login />} />
 
-        <Route
-          path="/super-admin"
-          element={
-            <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
-              <SuperAdminDashboard />
-            </ProtectedRoute>
-          }
-        />
+      {/* SUPER ADMIN */}
+      <Route
+        path="/super-admin/societies"
+        element={
+          <ProtectedRoute role="SUPER_ADMIN">
+            <SocietiesList />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+  path="/super-admin/societies/create"
+  element={
+    <ProtectedRoute role="SUPER_ADMIN">
+      <CreateSociety />
+    </ProtectedRoute>
+  }
+/>
 
-        <Route
-          path="/guard"
-          element={
-            <ProtectedRoute allowedRoles={["GUARD"]}>
-              <GuardDashboard />
-            </ProtectedRoute>
-          }
-        />
+<Route
+  path="/super-admin/societies/:societyId/create-admin"
+  element={
+    <ProtectedRoute role="SUPER_ADMIN">
+      <CreateAdmin />
+    </ProtectedRoute>
+  }
+/>
 
-        <Route
-          path="/tenant"
-          element={
-            <ProtectedRoute allowedRoles={["TENANT"]}>
-              <TenantDashboard />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+
+
+      {/* DEFAULT */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   );
 }
 

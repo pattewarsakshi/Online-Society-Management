@@ -1,23 +1,20 @@
 import { Navigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
 
-export default function ProtectedRoute({ allowedRoles, children }) {
-  const token = localStorage.getItem("token");
-  let role = localStorage.getItem("role");
-
-  // 🔥 normalize role if backend ever sends ROLE_*
-  if (role && role.startsWith("ROLE_")) {
-    role = role.replace("ROLE_", "");
-  }
+const ProtectedRoute = ({ children, role }) => {
+  const { user } = useAuth();
 
   // not logged in
-  if (!token) {
-    return <Navigate to="/" replace />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
   }
 
-  // role not allowed
-  if (!role || !allowedRoles.includes(role)) {
-    return <Navigate to="/" replace />;
+  // role mismatch
+  if (role && user.role !== role) {
+    return <Navigate to="/login" replace />;
   }
 
   return children;
-}
+};
+
+export default ProtectedRoute;
